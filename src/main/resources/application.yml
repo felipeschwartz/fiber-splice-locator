@@ -1,0 +1,36 @@
+cors:
+  originPatterns: http://localhost:3000,http://localhost:4200,http://localhost:8080
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: fiber_splice_locator
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/fiber_splice_locator
+    username: postgres
+    password: 1234567890
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+    show-sql: false
+    open-in-view: false
+  profiles:
+    active: dev
+
+
+security:
+  jwt:
+    secret: fiber-splice-locator-secret-key-2026
+    expiration: 86400000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+springdoc:
+  paths-to-match: /api/**/v1/**
+  swagger-ui:
+    use-root-path: true
