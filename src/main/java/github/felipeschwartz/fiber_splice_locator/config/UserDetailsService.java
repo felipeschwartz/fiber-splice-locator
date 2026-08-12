@@ -2,6 +2,7 @@ package github.felipeschwartz.fiber_splice_locator.config;
 
 
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
