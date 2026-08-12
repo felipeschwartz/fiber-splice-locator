@@ -1,11 +1,9 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
-import com.github.felipeschwartz.parkingsystem.controller.docs.UserControllerDocs;
-import com.github.felipeschwartz.parkingsystem.model.dto.CreateUserRequestDTO;
-import com.github.felipeschwartz.parkingsystem.model.dto.UserDTO;
-import com.github.felipeschwartz.parkingsystem.model.dto.UserEntityDTO;
-import com.github.felipeschwartz.parkingsystem.model.dto.UserIndividualDTO;
-import com.github.felipeschwartz.parkingsystem.service.UserService;
+
+import github.felipeschwartz.fiber_splice_locator.controller.docs.UserControllerDocs;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
+import github.felipeschwartz.fiber_splice_locator.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.hateoas.CollectionModel;
@@ -53,27 +51,15 @@ public class UserController implements UserControllerDocs {
         return ResponseEntity.ok(EntityModel.of(userDTO, userDTO.getLinks().stream().collect(Collectors.toList())));
     }
 
-    @GetMapping(value = "/cpf/{cpf}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Override
-    public ResponseEntity<EntityModel<UserIndividualDTO>> findByCpf(@PathVariable String cpf) {
-        UserIndividualDTO userIndividualDTO = service.findByCpf(cpf);
-        return ResponseEntity.ok(EntityModel.of(userIndividualDTO, userIndividualDTO.getLinks().stream().collect(Collectors.toList())));
-    }
 
-    @GetMapping(value = "/cnpj/{cnpj}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Override
-    public ResponseEntity<EntityModel<UserEntityDTO>> findByCnpj(@PathVariable String cnpj) {
-        UserEntityDTO userEntityDTO = service.findByCnpj(cnpj);
-        return ResponseEntity.ok(EntityModel.of(userEntityDTO, userEntityDTO.getLinks().stream().collect(Collectors.toList())));
-    }
 
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<EntityModel<UserDTO>> create(@RequestBody @Valid CreateUserRequestDTO requestDTO) {
-        UserDTO createdUser = service.create(requestDTO);
+    public ResponseEntity<EntityModel<UserDTO>> create(@RequestBody @Valid UserDTO userDTO) {
+        UserDTO createdUser = service.create(userDTO);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/id/{id}")
                 .buildAndExpand(createdUser.getId())
@@ -87,8 +73,8 @@ public class UserController implements UserControllerDocs {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<EntityModel<UserDTO>> update(@PathVariable Long id, @RequestBody @Valid CreateUserRequestDTO requestDTO) {
-        UserDTO updatedUser = service.update(id, requestDTO);
+    public ResponseEntity<EntityModel<UserDTO>> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
+        UserDTO updatedUser = service.update(id, userDTO);
         return ResponseEntity.ok(EntityModel.of(updatedUser, updatedUser.getLinks().stream().collect(Collectors.toList())));
     }
 

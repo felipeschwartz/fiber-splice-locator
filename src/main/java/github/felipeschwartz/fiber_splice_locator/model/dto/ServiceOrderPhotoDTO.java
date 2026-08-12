@@ -1,56 +1,30 @@
-package github.felipeschwartz.fiber_splice_locator.model.entities;
+package github.felipeschwartz.fiber_splice_locator.model.dto;
 
-import jakarta.persistence.*;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Entity
-@Table(name = "service_order_photos")
-public class ServiceOrderPhoto implements Serializable {
+public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "service_order_id",
-            nullable = false,
-            foreignKey = @ForeignKey(name = "fk_service_order_photo")
-    )
-    private ServiceOrder serviceOrder;
-
-    @Column(name = "storage_path", nullable = false)
+    private ServiceOrderDTO serviceOrderDTO;
     private String storagePath;
-
-    @Column(name = "original_filename", nullable = false)
     private String originalFilename;
-
-    @Column(name = "stored_filename", nullable = false)
     private String storedFilename;
-
-    @Column(name = "content_type", nullable = false)
     private String contentType;
-
-    @Column(name = "file_size", nullable = false)
     private Long fileSize;
-
-    @Column(name = "photo_order", nullable = false)
     private Integer photoOrder;
-
-    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public ServiceOrderPhoto() {
+    public ServiceOrderPhotoDTO() {
     }
 
-    public ServiceOrderPhoto(Long id, ServiceOrder serviceOrder, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
+    public ServiceOrderPhotoDTO(Long id, ServiceOrderDTO serviceOrderDTO, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
         this.id = id;
-        this.serviceOrder = serviceOrder;
+        this.serviceOrderDTO = serviceOrderDTO;
         this.storagePath = storagePath;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
@@ -68,12 +42,12 @@ public class ServiceOrderPhoto implements Serializable {
         this.id = id;
     }
 
-    public ServiceOrder getServiceOrder() {
-        return serviceOrder;
+    public ServiceOrderDTO getServiceOrder() {
+        return serviceOrderDTO;
     }
 
-    public void setServiceOrder(ServiceOrder serviceOrder) {
-        this.serviceOrder = serviceOrder;
+    public void setServiceOrder(ServiceOrderDTO serviceOrderDTO) {
+        this.serviceOrderDTO = serviceOrderDTO;
     }
 
     public String getStoragePath() {
@@ -135,7 +109,7 @@ public class ServiceOrderPhoto implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        ServiceOrderPhoto that = (ServiceOrderPhoto) o;
+        ServiceOrderPhotoDTO that = (ServiceOrderPhotoDTO) o;
         return Objects.equals(getId(), that.getId());
     }
 
