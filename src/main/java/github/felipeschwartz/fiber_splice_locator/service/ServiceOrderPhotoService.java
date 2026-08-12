@@ -6,7 +6,7 @@ import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRe
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,8 +87,8 @@ public class ServiceOrderPhotoService {
         photo.setStoragePath(
                 serviceOrderId + "/" + storedFileName
         );
-        photo.setStoredFileName(storedFileName);
-        photo.setOriginalFileName(file.getOriginalFilename());
+        photo.setStoredFilename(storedFileName);
+        photo.setOriginalFilename(file.getOriginalFilename());
         photo.setContentType(file.getContentType());
         photo.setFileSize(file.getSize());
 

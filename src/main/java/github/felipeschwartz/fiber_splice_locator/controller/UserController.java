@@ -73,8 +73,8 @@ public class UserController implements UserControllerDocs {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<EntityModel<UserDTO>> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO) {
-        UserDTO updatedUser = service.update(id, userDTO);
+    public ResponseEntity<EntityModel<UserDTO>> update(@RequestBody @Valid UserDTO userDTO) {
+        UserDTO updatedUser = service.update(userDTO);
         return ResponseEntity.ok(EntityModel.of(updatedUser, updatedUser.getLinks().stream().collect(Collectors.toList())));
     }
 

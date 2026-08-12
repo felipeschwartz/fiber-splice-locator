@@ -1,7 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
-import com.github.felipeschwartz.parkingsystem.config.JwtService;
-import com.github.felipeschwartz.parkingsystem.model.dto.LoginRequestDTO;
+import github.felipeschwartz.fiber_splice_locator.config.JwtService;
+import github.felipeschwartz.fiber_splice_locator.model.dto.LoginRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;

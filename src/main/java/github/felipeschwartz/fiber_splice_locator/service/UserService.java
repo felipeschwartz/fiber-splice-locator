@@ -7,7 +7,6 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
-import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,10 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -108,7 +104,7 @@ public class UserService {
         dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).findAll()).withRel("findAllUsers").withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).create(null)).withRel("createUser").withType("POST"));
-        dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), null)).withRel("updateUser").withType("PUT"));
+        dto.add(linkTo(methodOn(UserController.class).update(dto)).withRel("updateUser").withType("PUT"));
         dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("deleteUser").withType("DELETE"));
     }
 }

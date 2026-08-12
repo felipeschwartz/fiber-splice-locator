@@ -1,6 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 
-import com.github.felipeschwartz.parkingsystem.service.exceptions.ObjectNotFoundException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

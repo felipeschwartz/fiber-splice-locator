@@ -1,5 +1,10 @@
 cors:
   originPatterns: http://localhost:3000,http://localhost:4200,http://localhost:8080
+
+app:
+  storage:
+    service-order-photos: /var/lib/my-application/service-order-photos
+    
 spring:
   main:
     allow-circular-references: true

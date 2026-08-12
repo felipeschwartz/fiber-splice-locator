@@ -1,6 +1,5 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
-import github.felipeschwartz.fiber_splice_locator.model.dto.CreateUserRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -104,7 +103,7 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<EntityModel<UserDTO>> update(@PathVariable Long id, @RequestBody @Valid UserDTO userDTO);
+    ResponseEntity<EntityModel<UserDTO>> update(@RequestBody @Valid UserDTO userDTO);
 
     @Operation(
             summary = "Deletes a user",
