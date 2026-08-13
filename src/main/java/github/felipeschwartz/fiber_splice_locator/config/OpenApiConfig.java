@@ -13,13 +13,13 @@ public class OpenApiConfig {
     OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                    .title("REST API'S RESTFUL, WITH JAVA, SPRING BOOT, KUBERNETES AND DOCKER")
+                    .title("FIBER SPLICE LOCATOR")
                         .version("V1")
-                        .description("REST API'S RESTFUL, WITH JAVA, SPRING BOOT, KUBERNETES AND DOCKER")
-                        .termsOfService("https://github.com/felipeschwartz/parkingsystem")
+                        .description("APPLICATION FOR LOCATE FIBER SPLICE LOCATOR, REST API'S RESTFUL, WITH JAVA, SPRING BOOT AND DOCKER")
+                        .termsOfService("https://github.com/felipeschwartz/fiber-splice-locator")
                         .license(new License()
                             .name("Apache 2.0")
-                            .url("https://github.com/felipeschwartz/parkingsystem"))
+                            .url("https://github.com/felipeschwartz/fiber-splice-locator"))
                 );
     }
 }

@@ -5,6 +5,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
@@ -17,5 +18,5 @@ public interface CEOMapper {
     CEO toEntity(CEODTO dto);
 
     @Mapping(target = "id", ignore = true)
-    void updateEntityFromDTO(CEODTO updatedDTO, CEO existingCEO);
+    void updateEntityFromDTO(CEODTO updatedDTO, @MappingTarget CEO existingCEO);
 }

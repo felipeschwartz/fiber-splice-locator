@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.entities;
 
+import github.felipeschwartz.fiber_splice_locator.model.entities.Address;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -20,7 +21,8 @@ public class CEO implements Serializable {
     @Column
     private String notes;
 
-    @Embedded
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id")
     private Address address;
 
     public CEO() {

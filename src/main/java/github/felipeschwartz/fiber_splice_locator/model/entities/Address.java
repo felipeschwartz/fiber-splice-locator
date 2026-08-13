@@ -1,10 +1,24 @@
 package github.felipeschwartz.fiber_splice_locator.model.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 
-@Embeddable
-public class Address {
+import java.io.Serializable;
+import java.util.Objects;
+
+@Entity
+@Table(name = "addresses")
+public class Address  implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
+    private String geoLocation;
+
+    @Column
+    private String addressType;
 
     @Column
     private String street;
@@ -13,34 +27,52 @@ public class Address {
     private String streetNumber;
 
     @Column
-    private String complement;
+    private String referencePoint;
+
+    @Column
+    private String neighborhood;
 
     @Column
     private String city;
-
-    @Column
-    private String state;
-
-    @Column
-    private String zip;
-
-    @Column
-    private String country;
 
 
     public Address() {
     }
 
-    public Address(String street, String streetNumber, String complement, String city, String state, String zip, String country) {
+    public Address(Long id, String geoLocation, String addressType, String street, String streetNumber, String referencePoint, String neighborhood, String city) {
+        this.id = id;
+        this.geoLocation = geoLocation;
+        this.addressType = addressType;
         this.street = street;
         this.streetNumber = streetNumber;
-        this.complement = complement;
+        this.referencePoint = referencePoint;
+        this.neighborhood = neighborhood;
         this.city = city;
-        this.state = state;
-        this.zip = zip;
-        this.country = country;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getGeoLocation() {
+        return geoLocation;
+    }
+
+    public void setGeoLocation(String geoLocation) {
+        this.geoLocation = geoLocation;
+    }
+
+    public String getAddressType() {
+        return addressType;
+    }
+
+    public void setAddressType(String addressType) {
+        this.addressType = addressType;
+    }
 
     public String getStreet() {
         return street;
@@ -58,12 +90,20 @@ public class Address {
         this.streetNumber = streetNumber;
     }
 
-    public String getComplement() {
-        return complement;
+    public String getReferencePoint() {
+        return referencePoint;
     }
 
-    public void setComplement(String complement) {
-        this.complement = complement;
+    public void setReferencePoint(String referencePoint) {
+        this.referencePoint = referencePoint;
+    }
+
+    public String getNeighborhood() {
+        return neighborhood;
+    }
+
+    public void setNeighborhood(String neighborhood) {
+        this.neighborhood = neighborhood;
     }
 
     public String getCity() {
@@ -74,29 +114,15 @@ public class Address {
         this.city = city;
     }
 
-    public String getState() {
-        return state;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return Objects.equals(getId(), address.getId());
     }
 
-    public void setState(String state) {
-        this.state = state;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
-
-    public String getZip() {
-        return zip;
-    }
-
-    public void setZip(String zip) {
-        this.zip = zip;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-
 }
