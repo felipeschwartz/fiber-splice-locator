@@ -1,11 +1,15 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
+import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderPhotoMapper;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderPhoto;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,19 +25,26 @@ import java.util.UUID;
 
 @Service
 public class ServiceOrderPhotoService {
+    private Logger logger = LoggerFactory.getLogger(ServiceOrderPhotoService.class.getName());
 
     private final Path storageRoot;
     private final ServiceOrderRepository serviceOrderRepository;
     private final ServiceOrderPhotoRepository photoRepository;
+    private final ServiceOrderMapper serviceOrderMapper;
+    private final ServiceOrderPhotoMapper serviceOrderPhotoMapper;
 
     public ServiceOrderPhotoService(
             @Value("${app.storage.service-order-photos}") String storagePath,
             ServiceOrderRepository serviceOrderRepository,
-            ServiceOrderPhotoRepository photoRepository
+            ServiceOrderPhotoRepository photoRepository,
+            ServiceOrderMapper serviceOrderMapper,
+            ServiceOrderPhotoMapper serviceOrderPhotoMapper
     ) {
         this.storageRoot = Paths.get(storagePath).toAbsolutePath().normalize();
         this.serviceOrderRepository = serviceOrderRepository;
         this.photoRepository = photoRepository;
+        this.serviceOrderMapper = serviceOrderMapper;
+        this.serviceOrderPhotoMapper = serviceOrderPhotoMapper;
     }
 
     @Transactional

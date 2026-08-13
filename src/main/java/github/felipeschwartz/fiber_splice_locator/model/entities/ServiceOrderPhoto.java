@@ -13,8 +13,7 @@ public class ServiceOrderPhoto implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Long serviceOrderPhotoId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -48,8 +47,8 @@ public class ServiceOrderPhoto implements Serializable {
     public ServiceOrderPhoto() {
     }
 
-    public ServiceOrderPhoto(Long id, ServiceOrder serviceOrder, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
-        this.id = id;
+    public ServiceOrderPhoto(Long serviceOrderPhotoId, ServiceOrder serviceOrder, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
+        this.serviceOrderPhotoId = serviceOrderPhotoId;
         this.serviceOrder = serviceOrder;
         this.storagePath = storagePath;
         this.originalFilename = originalFilename;
@@ -60,12 +59,12 @@ public class ServiceOrderPhoto implements Serializable {
         this.createdAt = createdAt;
     }
 
-    public Long getId() {
-        return id;
+    public Long getServiceOrderPhotoId() {
+        return serviceOrderPhotoId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setServiceOrderPhotoId(Long serviceOrderPhotoId) {
+        this.serviceOrderPhotoId = serviceOrderPhotoId;
     }
 
     public ServiceOrder getServiceOrder() {
@@ -136,11 +135,11 @@ public class ServiceOrderPhoto implements Serializable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ServiceOrderPhoto that = (ServiceOrderPhoto) o;
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getServiceOrderPhotoId(), that.getServiceOrderPhotoId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(getServiceOrderPhotoId());
     }
 }

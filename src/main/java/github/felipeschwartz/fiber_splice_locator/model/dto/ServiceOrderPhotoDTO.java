@@ -9,8 +9,8 @@ import java.util.Objects;
 public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private ServiceOrderDTO serviceOrderDTO;
+    private Long serviceOrderPhotoId;
+    private Long serviceOrderId;
     private String storagePath;
     private String originalFilename;
     private String storedFilename;
@@ -22,9 +22,9 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
     public ServiceOrderPhotoDTO() {
     }
 
-    public ServiceOrderPhotoDTO(Long id, ServiceOrderDTO serviceOrderDTO, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
-        this.id = id;
-        this.serviceOrderDTO = serviceOrderDTO;
+    public ServiceOrderPhotoDTO(Long serviceOrderPhotoId, Long serviceOrderId, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
+        this.serviceOrderPhotoId = serviceOrderPhotoId;
+        this.serviceOrderId = serviceOrderId;
         this.storagePath = storagePath;
         this.originalFilename = originalFilename;
         this.storedFilename = storedFilename;
@@ -34,20 +34,20 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
         this.createdAt = createdAt;
     }
 
-    public Long getId() {
-        return id;
+    public Long getServiceOrderPhotoId() {
+        return serviceOrderPhotoId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setServiceOrderPhotoId(Long serviceOrderPhotoId) {
+        this.serviceOrderPhotoId = serviceOrderPhotoId;
     }
 
-    public ServiceOrderDTO getServiceOrder() {
-        return serviceOrderDTO;
+    public Long getServiceOrderId() {
+        return serviceOrderId;
     }
 
-    public void setServiceOrder(ServiceOrderDTO serviceOrderDTO) {
-        this.serviceOrderDTO = serviceOrderDTO;
+    public void setServiceOrderId(Long serviceOrderId) {
+        this.serviceOrderId = serviceOrderId;
     }
 
     public String getStoragePath() {
@@ -110,11 +110,11 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ServiceOrderPhotoDTO that = (ServiceOrderPhotoDTO) o;
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getServiceOrderPhotoId(), that.getServiceOrderPhotoId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(getServiceOrderPhotoId());
     }
 }

@@ -16,7 +16,7 @@ public class ServiceOrder implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long serviceOrderId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
@@ -50,8 +50,8 @@ public class ServiceOrder implements Serializable {
     public ServiceOrder() {
     }
 
-    public ServiceOrder(Long id, CEO ceo, ServiceOrderStatus status, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
+    public ServiceOrder(Long serviceOrderId, CEO ceo, ServiceOrderStatus status, User user, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.serviceOrderId = serviceOrderId;
         this.ceo = ceo;
         this.status = status;
         this.user = user;
@@ -59,12 +59,12 @@ public class ServiceOrder implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Long getId() {
-        return id;
+    public Long getServiceOrderId() {
+        return serviceOrderId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setServiceOrderId(Long serviceOrderId) {
+        this.serviceOrderId = serviceOrderId;
     }
 
     public CEO getCeo() {
@@ -119,11 +119,11 @@ public class ServiceOrder implements Serializable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ServiceOrder that = (ServiceOrder) o;
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getServiceOrderId(), that.getServiceOrderId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(getServiceOrderId());
     }
 }

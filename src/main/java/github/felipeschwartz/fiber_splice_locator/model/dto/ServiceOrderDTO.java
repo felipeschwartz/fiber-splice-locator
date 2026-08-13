@@ -12,40 +12,41 @@ import java.util.Set;
 public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private CEODTO CEODTO;
+    private Long serviceOrderId;
+    private CEODTO ceo;
     private ServiceOrderStatus status;
     private UserDTO user;
-    private Set<ServiceOrderPhotoDTO> serviceOrderPhotoDTOS = new HashSet<>();
+    private Set<ServiceOrderPhotoDTO> serviceOrderPhotos = new HashSet<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public ServiceOrderDTO() {
     }
 
-    public ServiceOrderDTO(Long id, CEODTO CEODTO, ServiceOrderStatus status, UserDTO user, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.id = id;
-        this.CEODTO = CEODTO;
+    public ServiceOrderDTO(Long serviceOrderId, CEODTO ceo, ServiceOrderStatus status, UserDTO user, Set<ServiceOrderPhotoDTO> serviceOrderPhotos, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.serviceOrderId = serviceOrderId;
+        this.ceo = ceo;
         this.status = status;
         this.user = user;
+        this.serviceOrderPhotos = serviceOrderPhotos != null ? serviceOrderPhotos : new HashSet<>();
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Long getId() {
-        return id;
+    public Long getServiceOrderId() {
+        return serviceOrderId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setServiceOrderId(Long serviceOrderId) {
+        this.serviceOrderId = serviceOrderId;
     }
 
     public CEODTO getCeo() {
-        return CEODTO;
+        return ceo;
     }
 
-    public void setCeo(CEODTO CEODTO) {
-        this.CEODTO = CEODTO;
+    public void setCeo(CEODTO ceo) {
+        this.ceo = ceo;
     }
 
     public ServiceOrderStatus getStatus() {
@@ -65,11 +66,11 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     }
 
     public Set<ServiceOrderPhotoDTO> getServiceOrderPhotos() {
-        return serviceOrderPhotoDTOS;
+        return serviceOrderPhotos;
     }
 
-    public void setServiceOrderPhotos(Set<ServiceOrderPhotoDTO> serviceOrderPhotoDTOS) {
-        this.serviceOrderPhotoDTOS = serviceOrderPhotoDTOS;
+    public void setServiceOrderPhotos(Set<ServiceOrderPhotoDTO> serviceOrderPhotos) {
+        this.serviceOrderPhotos = serviceOrderPhotos;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -92,11 +93,11 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ServiceOrderDTO that = (ServiceOrderDTO) o;
-        return Objects.equals(getId(), that.getId());
+        return Objects.equals(getServiceOrderId(), that.getServiceOrderId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hashCode(getServiceOrderId());
     }
 }

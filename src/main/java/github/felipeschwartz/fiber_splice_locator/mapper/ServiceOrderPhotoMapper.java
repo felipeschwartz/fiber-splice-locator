@@ -10,15 +10,15 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ServiceOrderPhotoMapper {
 
-    @Mapping(target = "serviceOrder", ignore = true)
+    @Mapping(target = "serviceOrderId", source = "serviceOrder.serviceOrderId")
     ServiceOrderPhotoDTO toDTO(ServiceOrderPhoto entity);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "serviceOrderPhotoId", ignore = true)
     @Mapping(target = "serviceOrder", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     ServiceOrderPhoto toEntity(ServiceOrderPhotoDTO dto);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "serviceOrderPhotoId", ignore = true)
     @Mapping(target = "serviceOrder", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromDTO(ServiceOrderPhotoDTO dto, @MappingTarget ServiceOrderPhoto entity);

@@ -9,15 +9,17 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = { UserMapper.class, AddressMapper.class, ServiceOrderPhotoMapper.class }
+        uses = { UserMapper.class, AddressMapper.class, CEOMapper.class, ServiceOrderPhotoMapper.class }
 )
 public interface ServiceOrderMapper {
 
     ServiceOrderDTO toDTO(ServiceOrder entity);
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "serviceOrderId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     ServiceOrder toEntity(ServiceOrderDTO dto);
 
+    @Mapping(target = "serviceOrderId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromDTO(ServiceOrderDTO dto, @MappingTarget ServiceOrder entity);
 }
