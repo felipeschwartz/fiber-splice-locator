@@ -1,25 +1,89 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.controller.ServiceOrderController;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
-import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 public class ServiceOrderService {
-    private Logger logger = LoggerFactory.getLogger(ServiceOrderService.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(ServiceOrderService.class);
 
     private final ServiceOrderRepository serviceOrderRepository;
-    private final ServiceOrderPhotoRepository photoRepository;
     private final ServiceOrderMapper serviceOrderMapper;
 
-    public ServiceOrderService(ServiceOrderRepository serviceOrderRepository, ServiceOrderPhotoRepository photoRepository, ServiceOrderMapper serviceOrderMapper, ServiceOrderMapper serviceOrderMapper1) {
+    public ServiceOrderService(ServiceOrderRepository serviceOrderRepository, ServiceOrderMapper serviceOrderMapper) {
         this.serviceOrderRepository = serviceOrderRepository;
-        this.photoRepository = photoRepository;
-        this.serviceOrderMapper = serviceOrderMapper1;
+        this.serviceOrderMapper = serviceOrderMapper;
     }
 
+    @Transactional(readOnly = true)
+    public List<ServiceOrderDTO> findAll() {
+        logger.info("Finding all Service Orders!");
+        List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findAll().stream()
+                .map(serviceOrderMapper::toDTO)
+                .collect(Collectors.toList());
+        serviceOrders.forEach(this::addHateoasLinks);
+        return serviceOrders;
+    }
 
+    @Transactional(readOnly = true)
+    public ServiceOrderDTO findById(Long id) {
+        logger.info("Finding Service Order with id {}", id);
+        ServiceOrderDTO serviceOrderDTO = serviceOrderRepository.findById(id)
+                .map(serviceOrderMapper::toDTO)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+        addHateoasLinks(serviceOrderDTO);
+        return serviceOrderDTO;
+    }
+
+    @Transactional
+    public ServiceOrderDTO create(ServiceOrderDTO serviceOrderDTO) {
+        logger.info("Creating one Service Order!");
+        ServiceOrderDTO createdServiceOrderDTO = serviceOrderMapper.toDTO(
+                serviceOrderRepository.save(serviceOrderMapper.toEntity(serviceOrderDTO))
+        );
+        addHateoasLinks(createdServiceOrderDTO);
+        return createdServiceOrderDTO;
+    }
+
+    @Transactional
+    public ServiceOrderDTO update(Long id, ServiceOrderDTO serviceOrderDTO) {
+        logger.info("Updating Service Order with id {}", id);
+        var entity = serviceOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+
+        serviceOrderMapper.updateEntityFromDTO(serviceOrderDTO, entity);
+        ServiceOrderDTO updatedServiceOrderDTO = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
+        addHateoasLinks(updatedServiceOrderDTO);
+        return updatedServiceOrderDTO;
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        logger.info("Deleting Service Order with id {}", id);
+        if (!serviceOrderRepository.existsById(id)) {
+            throw new EntityNotFoundException("Service order not found: " + id);
+        }
+        serviceOrderRepository.deleteById(id);
+    }
+
+    private void addHateoasLinks(ServiceOrderDTO dto) {
+        dto.add(linkTo(methodOn(ServiceOrderController.class).findById(dto.getServiceOrderId())).withSelfRel().withType("GET"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).findAll()).withRel("findAll").withType("GET"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).create(dto)).withRel("create").withType("POST"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).update(dto.getServiceOrderId(), dto)).withRel("update").withType("PUT"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).delete(dto.getServiceOrderId())).withRel("delete").withType("DELETE"));
+    }
 }
