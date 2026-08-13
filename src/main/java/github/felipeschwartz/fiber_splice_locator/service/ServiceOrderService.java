@@ -7,6 +7,7 @@ import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderReposit
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderDTO> findAll() {
         logger.info("Finding all Service Orders!");
         List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findAll().stream()
@@ -39,6 +41,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO findById(Long id) {
         logger.info("Finding Service Order with id {}", id);
         ServiceOrderDTO serviceOrderDTO = serviceOrderRepository.findById(id)
@@ -49,6 +52,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ServiceOrderDTO create(ServiceOrderDTO serviceOrderDTO) {
         logger.info("Creating one Service Order!");
         ServiceOrderDTO createdServiceOrderDTO = serviceOrderMapper.toDTO(
@@ -59,6 +63,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO update(Long id, ServiceOrderDTO serviceOrderDTO) {
         logger.info("Updating Service Order with id {}", id);
         var entity = serviceOrderRepository.findById(id)
@@ -71,6 +76,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting Service Order with id {}", id);
         if (!serviceOrderRepository.existsById(id)) {

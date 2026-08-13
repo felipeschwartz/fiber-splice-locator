@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<UserDTO> findAll() {
         logger.info("Finding all Users!");
         List<UserDTO> userDTOS = userRepository.findAll()
@@ -47,7 +47,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO findById(Long id) {
         logger.info("Finding one User by ID: {}", id);
         User user = userRepository.findById(id)
@@ -74,7 +74,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN')")
     public UserDTO update(UserDTO updatedDTO) {
         logger.info("Updating User with ID: {}", updatedDTO.getId());
 

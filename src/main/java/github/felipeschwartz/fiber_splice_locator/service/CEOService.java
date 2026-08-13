@@ -44,7 +44,7 @@ public class CEOService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO findById(Long id) {
         logger.info("Finding one CEO by ID: {}", id);
         CEO ceo = ceoRepository.findById(id)
@@ -70,7 +70,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    @PreAuthorize("hasRole('ADMIN')")
     public CEODTO update(CEODTO updatedDTO) {
         logger.info("Updating CEO with ID: {}", updatedDTO.getId());
 

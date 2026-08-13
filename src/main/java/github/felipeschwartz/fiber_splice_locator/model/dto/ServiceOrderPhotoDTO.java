@@ -9,7 +9,7 @@ import java.util.Objects;
 public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long serviceOrderPhotoId;
+    private Long id;
     private Long serviceOrderId;
     private String storagePath;
     private String originalFilename;
@@ -22,8 +22,8 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
     public ServiceOrderPhotoDTO() {
     }
 
-    public ServiceOrderPhotoDTO(Long serviceOrderPhotoId, Long serviceOrderId, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
-        this.serviceOrderPhotoId = serviceOrderPhotoId;
+    public ServiceOrderPhotoDTO(Long id, Long serviceOrderId, String storagePath, String originalFilename, String storedFilename, String contentType, Long fileSize, Integer photoOrder, LocalDateTime createdAt) {
+        this.id = id;
         this.serviceOrderId = serviceOrderId;
         this.storagePath = storagePath;
         this.originalFilename = originalFilename;
@@ -34,12 +34,12 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
         this.createdAt = createdAt;
     }
 
-    public Long getServiceOrderPhotoId() {
-        return serviceOrderPhotoId;
+    public Long getId() {
+        return id;
     }
 
-    public void setServiceOrderPhotoId(Long serviceOrderPhotoId) {
-        this.serviceOrderPhotoId = serviceOrderPhotoId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getServiceOrderId() {
@@ -110,11 +110,11 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ServiceOrderPhotoDTO that = (ServiceOrderPhotoDTO) o;
-        return Objects.equals(getServiceOrderPhotoId(), that.getServiceOrderPhotoId());
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getServiceOrderPhotoId());
+        return Objects.hashCode(getId());
     }
 }
