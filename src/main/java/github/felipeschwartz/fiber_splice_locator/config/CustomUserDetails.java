@@ -14,8 +14,6 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private Long id;
     @Getter
-    private String name;
-    @Getter
     private String email;
     @Getter
     private String password;
@@ -24,12 +22,13 @@ public class CustomUserDetails implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
-        this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
 
         this.authorities = user.getRoles().stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority(
+                        role.startsWith("ROLE_") ? role : "ROLE_" + role
+                ))
                 .collect(Collectors.toList());
     }
 
