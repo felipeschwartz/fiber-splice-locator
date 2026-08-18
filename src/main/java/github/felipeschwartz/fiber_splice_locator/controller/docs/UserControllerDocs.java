@@ -103,7 +103,10 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<EntityModel<UserDTO>> update(@RequestBody @Valid UserDTO userDTO);
+    ResponseEntity<EntityModel<UserDTO>> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UserDTO userDTO
+    );
 
     @Operation(
             summary = "Deletes a user",

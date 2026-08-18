@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -103,7 +104,11 @@ public interface CEOControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<EntityModel<CEODTO>> update(@RequestBody @Valid CEODTO ceoDTO);
+    ResponseEntity<EntityModel<CEODTO>> update(
+            @PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestBody
+            @Valid CEODTO ceoDTO
+    );
 
     @Operation(
             summary = "Deletes a ceo",

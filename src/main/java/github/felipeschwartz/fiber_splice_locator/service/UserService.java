@@ -104,7 +104,7 @@ public class UserService {
         dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).findAll()).withRel("findAllUsers").withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).create(null)).withRel("createUser").withType("POST"));
-        dto.add(linkTo(methodOn(UserController.class).update(dto)).withRel("updateUser").withType("PUT"));
+        dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), dto)).withRel("updateUser").withType("PUT"));
         dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("deleteUser").withType("DELETE"));
     }
 }

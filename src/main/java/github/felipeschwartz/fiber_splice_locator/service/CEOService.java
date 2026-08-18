@@ -100,7 +100,7 @@ public class CEOService {
         dto.add(linkTo(methodOn(CEOController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(CEOController.class).findAll()).withRel("findAllCEOs").withType("GET"));
         dto.add(linkTo(methodOn(CEOController.class).create(null)).withRel("createCEO").withType("POST"));
-        dto.add(linkTo(methodOn(CEOController.class).update(dto)).withRel("updateCEO").withType("PUT"));
+        dto.add(linkTo(methodOn(CEOController.class).update(dto.getId(), dto)).withRel("updateCEO").withType("PUT"));
         dto.add(linkTo(methodOn(CEOController.class).delete(dto.getId())).withRel("deleteCEO").withType("DELETE"));
     }
 }

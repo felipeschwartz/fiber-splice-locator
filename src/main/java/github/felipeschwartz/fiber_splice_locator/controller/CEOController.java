@@ -71,9 +71,20 @@ public class CEOController implements CEOControllerDocs {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<EntityModel<CEODTO>> update(@RequestBody @Valid CEODTO ceoDTO) {
+    public ResponseEntity<EntityModel<CEODTO>> update(
+            @PathVariable Long id,
+            @RequestBody @Valid CEODTO ceoDTO
+    ) {
+        ceoDTO.setId(id);
+
         CEODTO updatedCEO = service.update(ceoDTO);
-        return ResponseEntity.ok(EntityModel.of(updatedCEO, updatedCEO.getLinks().stream().collect(Collectors.toList())));
+
+        return ResponseEntity.ok(
+                EntityModel.of(
+                        updatedCEO,
+                        updatedCEO.getLinks()
+                )
+        );
     }
 
     @DeleteMapping(value = "/{id}")

@@ -176,6 +176,15 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- Adição do plugin Maven Surefire para configurar o Mockito como agente -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version> <!-- Use a versão mais recente -->
+				<configuration>
+					<argLine>-javaagent:"${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar"</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
