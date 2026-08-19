@@ -3,6 +3,7 @@ FROM eclipse-temurin:25.0.3_9-jdk-noble AS builder
 WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
+RUN chmod +x mvnw  # Adicione esta linha
 RUN ./mvnw dependency:go-offline
 COPY src ./src
 RUN ./mvnw clean install -DskipTests
@@ -13,10 +14,3 @@ WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
-
-#FROM azul/zulu-openjdk:25-jre
-#WORKDIR /app
-#COPY target/*.jar app.jar
-#EXPOSE 8080
-#ENTRYPOINT ["java", "-jar", "app.jar"]
