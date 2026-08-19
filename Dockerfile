@@ -1,5 +1,5 @@
 # Stage de build
-FROM azul/zulu-openjdk:25-jdk AS builder
+FROM eclipse-temurin:25.0.3_9-jdk-noble AS builder
 WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
@@ -8,7 +8,7 @@ COPY src ./src
 RUN ./mvnw clean install -DskipTests
 
 # Stage de execução
-FROM azul/zulu-openjdk:25-jre
+FROM eclipse-temurin:25.0.3_9-jre-noble
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
