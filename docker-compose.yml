@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:18
+    image: felipeschwartz/postgres:18
     restart: unless-stopped
     environment:
       TZ: America/Sao_Paulo
@@ -42,7 +42,7 @@ services:
       - fiber-splice-locator-network
 
   portainer:
-    image: portainer/portainer-ce:latest
+    image: felipeschwartz/portainer-ce:latest
     restart: unless-stopped
     ports:
       - "9000:9000"
