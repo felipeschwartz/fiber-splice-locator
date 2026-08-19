@@ -12,18 +12,22 @@ spring:
     name: fiber_splice_locator
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://dpg-da2qagon74is738girdg-a:5432/fiber_splice_locator
-    username: fiber_splice_locator_user
-    password: C2uyC9elAF9SY2XIbWxCl3TfgdZrmxrz
+    #url: jdbc:postgresql://dpg-da2qagon74is738girdg-a:5432/fiber_splice_locator
+    url: jdbc:postgresql://localhost:5432/fiber_splice_locator
+    #username: fiber_splice_locator_user
+    username: postgres
+    #password: C2uyC9elAF9SY2XIbWxCl3TfgdZrmxrz
+    password: 1234567890
   jpa:
     hibernate:
-      ddl-auto: update
+      #ddl-auto: update
+      ddl-auto: create-drop
     properties:
       hibernate:
     show-sql: false
     open-in-view: false
   profiles:
-    active: prod
+    active: dev
 
 
 security:

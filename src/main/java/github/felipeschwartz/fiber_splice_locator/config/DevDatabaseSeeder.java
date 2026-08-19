@@ -1,6 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.config;
 
 import github.felipeschwartz.fiber_splice_locator.model.entities.*;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
@@ -19,7 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Component
-@Profile("prod")
+@Profile("dev")
 public class DevDatabaseSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DevDatabaseSeeder.class);
@@ -102,6 +103,8 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         ceo1.setAddress(buildAddress(
                 "-30.034647,-51.217659", "Avenida", "Ipiranga", "1200",
                 "Em frente ao posto de gasolina", "Praia de Belas", "Porto Alegre"));
+        ceo1.setStatus(CEOStatus.STANDARDIZED);
+
 
         CEO ceo2 = new CEO();
         ceo2.setBoxNumber("CEO-002");
@@ -109,6 +112,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         ceo2.setAddress(buildAddress(
                 "-30.027699,-51.229752", "Rua", "Dos Andradas", "500",
                 "Ao lado da farmácia", "Centro Histórico", "Porto Alegre"));
+        ceo2.setStatus(CEOStatus.DAMAGED);
 
         CEO ceo3 = new CEO();
         ceo3.setBoxNumber("CEO-003");
@@ -116,6 +120,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         ceo3.setAddress(buildAddress(
                 "-30.037750,-51.212555", "Avenida", "Osvaldo Aranha", "800",
                 "Próximo ao ponto de ônibus", "Bom Fim", "Porto Alegre"));
+        ceo3.setStatus(CEOStatus.UNDER_MAINTENANCE);
 
         CEO ceo4 = new CEO();
         ceo4.setBoxNumber("CEO-004");
@@ -123,6 +128,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         ceo4.setAddress(buildAddress(
                 "-30.017685,-51.180279", "Rua", "Padre Chagas", "300",
                 "Em frente ao restaurante", "Moinhos de Vento", "Porto Alegre"));
+        ceo4.setStatus(CEOStatus.CANCELLED);
 
         CEO ceo5 = new CEO();
         ceo5.setBoxNumber("CEO-005");
@@ -130,6 +136,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         ceo5.setAddress(buildAddress(
                 "-30.043027,-51.220894", "Beco", "Do Salso", "45",
                 "Muro lateral do prédio", "Cidade Baixa", "Porto Alegre"));
+        ceo5.setStatus(CEOStatus.STANDARDIZED);
 
         return ceoRepository.saveAll(List.of(ceo1, ceo2, ceo3, ceo4, ceo5));
     }

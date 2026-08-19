@@ -1,6 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.entities;
 
-import github.felipeschwartz.fiber_splice_locator.model.entities.Address;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -25,14 +25,19 @@ public class CEO implements Serializable {
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CEOStatus status;
+
     public CEO() {
     }
 
-    public CEO(Long id, String boxNumber, String notes, Address address) {
+    public CEO(Long id, String boxNumber, String notes, Address address, CEOStatus status) {
         this.id = id;
         this.boxNumber = boxNumber;
         this.notes = notes;
         this.address = address;
+        this.status = status;
     }
 
     public Long getId() {
@@ -57,6 +62,14 @@ public class CEO implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public CEOStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CEOStatus status) {
+        this.status = status;
     }
 
     public Address getAddress() {

@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
@@ -12,11 +13,12 @@ public class CEODTO extends RepresentationModel<CEODTO> implements Serializable 
     private String boxNumber;
     private String notes;
     private AddressDTO address;
+    private CEOStatus status;
 
     public CEODTO() {
     }
 
-    public CEODTO(Long id, String boxNumber, String notes, AddressDTO address) {
+    public CEODTO(Long id, String boxNumber, String notes, AddressDTO address, CEOStatus status) {
         this.id = id;
         this.boxNumber = boxNumber;
         this.notes = notes;
@@ -53,6 +55,14 @@ public class CEODTO extends RepresentationModel<CEODTO> implements Serializable 
 
     public void setAddress(AddressDTO address) {
         this.address = address;
+    }
+
+    public CEOStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CEOStatus status) {
+        this.status = status;
     }
 
     @Override
