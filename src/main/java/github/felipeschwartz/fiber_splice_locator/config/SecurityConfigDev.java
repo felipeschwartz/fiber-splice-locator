@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.List;
 
 @Configuration
-@Profile("dev")
+@Profile("prod")
 @EnableMethodSecurity(securedEnabled = true)
 public class SecurityConfigDev {
 

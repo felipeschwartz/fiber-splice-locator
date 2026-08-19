@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Component
-@Profile("dev")
+@Profile("prod")
 public class DevDatabaseSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DevDatabaseSeeder.class);
