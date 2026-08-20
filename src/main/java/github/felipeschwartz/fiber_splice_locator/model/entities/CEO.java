@@ -29,15 +29,19 @@ public class CEO implements Serializable {
     @Column(nullable = false)
     private CEOStatus status;
 
+    @Column(nullable = false)
+    private Boolean active;
+
     public CEO() {
     }
 
-    public CEO(Long id, String boxNumber, String notes, Address address, CEOStatus status) {
+    public CEO(Long id, String boxNumber, String notes, Address address, CEOStatus status, Boolean active) {
         this.id = id;
         this.boxNumber = boxNumber;
         this.notes = notes;
         this.address = address;
         this.status = status;
+        this.active = active;
     }
 
     public Long getId() {
@@ -64,12 +68,12 @@ public class CEO implements Serializable {
         this.notes = notes;
     }
 
-    public CEOStatus getStatus() {
-        return status;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setStatus(CEOStatus status) {
-        this.status = status;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public Address getAddress() {

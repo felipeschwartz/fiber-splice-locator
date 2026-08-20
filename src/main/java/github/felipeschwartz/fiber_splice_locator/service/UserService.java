@@ -89,7 +89,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting one User!");
         if (!userRepository.existsById(id)) {

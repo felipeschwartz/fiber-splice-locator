@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -24,14 +25,18 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
 
     private Set<String> roles = new HashSet<>();
 
+    @Column(nullable = false)
+    private Boolean active;
+
     protected UserDTO() {
     }
 
-    public UserDTO(Long id, String name, String email, String password) {
+    public UserDTO(Long id, String name, String email, String password, Boolean active) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.active = active;
     }
 
     public Long getId() {
@@ -72,6 +77,14 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     @Override

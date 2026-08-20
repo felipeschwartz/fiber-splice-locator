@@ -30,7 +30,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderDTO> findAll() {
         logger.info("Finding all Service Orders!");
         List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findAll().stream()
@@ -41,7 +41,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO findById(Long id) {
         logger.info("Finding Service Order with id {}", id);
         ServiceOrderDTO serviceOrderDTO = serviceOrderRepository.findById(id)
@@ -52,7 +52,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO create(ServiceOrderDTO serviceOrderDTO) {
         logger.info("Creating one Service Order!");
         ServiceOrderDTO createdServiceOrderDTO = serviceOrderMapper.toDTO(
@@ -63,7 +63,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO update(Long id, ServiceOrderDTO serviceOrderDTO) {
         logger.info("Updating Service Order with id {}", id);
         var entity = serviceOrderRepository.findById(id)
@@ -76,7 +76,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting Service Order with id {}", id);
         if (!serviceOrderRepository.existsById(id)) {

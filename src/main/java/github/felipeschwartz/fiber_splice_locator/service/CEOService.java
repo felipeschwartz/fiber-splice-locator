@@ -32,7 +32,7 @@ public class CEOService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<CEODTO> findAll() {
         logger.info("Finding all CEOs!");
         List<CEODTO> ceoDTOS = ceoRepository.findAll()
@@ -44,7 +44,7 @@ public class CEOService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO findById(Long id) {
         logger.info("Finding one CEO by ID: {}", id);
         CEO ceo = ceoRepository.findById(id)
@@ -57,7 +57,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO create(CEODTO requestDTO) {
         logger.info("Creating a CEO: {}", requestDTO.getBoxNumber());
         CEO ceo = ceoMapper.toEntity(requestDTO);
@@ -70,7 +70,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO update(CEODTO updatedDTO) {
         logger.info("Updating CEO with ID: {}", updatedDTO.getId());
 
@@ -85,7 +85,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting one CEO!");
         if (!ceoRepository.existsById(id)) {

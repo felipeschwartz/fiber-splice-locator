@@ -57,7 +57,7 @@ public class ServiceOrderPhotoService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderPhotoDTO> findAllByServiceOrder(Long serviceOrderId) {
         logger.info("Finding all photos for Service Order {}", serviceOrderId);
         if (!serviceOrderRepository.existsById(serviceOrderId)) {
@@ -69,7 +69,7 @@ public class ServiceOrderPhotoService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderPhotoDTO findById(Long id) {
         logger.info("Finding photo with id {}", id);
         return photoRepository.findById(id)
@@ -78,7 +78,7 @@ public class ServiceOrderPhotoService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderPhotoDTO savePhoto(Long serviceOrderId, MultipartFile file) throws IOException {
         validateFile(file);
 
@@ -117,7 +117,7 @@ public class ServiceOrderPhotoService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderPhotoDTO update(Long id, ServiceOrderPhotoDTO dto) {
         logger.info("Updating photo with id {}", id);
         ServiceOrderPhoto entity = photoRepository.findById(id)
@@ -127,7 +127,7 @@ public class ServiceOrderPhotoService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting photo with id {}", id);
         ServiceOrderPhoto photo = photoRepository.findById(id)
