@@ -18,13 +18,17 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private String password;
 
+    @Getter
+    private boolean active;
+
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user) {
+        this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
-
+        this.active = user.getActive();
         this.authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(
                         role.startsWith("ROLE_") ? role : "ROLE_" + role
@@ -64,7 +68,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return active;
     }
 
 }

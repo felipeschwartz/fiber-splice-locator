@@ -31,12 +31,12 @@ public class User implements Serializable {
     private Set<String> roles = new HashSet<>();
 
     @Column(nullable = false)
-    private Boolean active;
+    private boolean active;
 
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, Boolean active) {
+    public User(Long id, String name, String email, String password, boolean active) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -84,11 +84,11 @@ public class User implements Serializable {
         this.roles = roles;
     }
 
-    public Boolean getActive() {
+    public boolean getActive() {
         return active;
     }
 
-    public void setActive(Boolean active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 

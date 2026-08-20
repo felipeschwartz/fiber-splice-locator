@@ -84,6 +84,14 @@ public class CEO implements Serializable {
         this.address = address;
     }
 
+    public CEOStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CEOStatus status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

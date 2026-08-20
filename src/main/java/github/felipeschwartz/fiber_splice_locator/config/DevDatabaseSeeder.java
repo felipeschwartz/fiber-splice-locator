@@ -63,37 +63,49 @@ public class DevDatabaseSeeder implements CommandLineRunner {
     }
 
     private List<User> seedUsers() {
+        User god = new User();
+        god.setName("Felipe Schwartz");
+        god.setEmail("god@fiberlocator.com");
+        god.setPassword(passwordEncoder.encode("god123"));
+        god.setRoles(Set.of("GOD_ADMIN"));
+        god.setActive(true);
+
         User admin = new User();
-        admin.setName("Felipe Schwartz");
+        admin.setName("Admin User");
         admin.setEmail("admin@fiberlocator.com");
         admin.setPassword(passwordEncoder.encode("admin123"));
         admin.setRoles(Set.of("ADMIN"));
+        admin.setActive(true);
 
         User tech1 = new User();
         tech1.setName("Carlos Silva");
         tech1.setEmail("carlos.silva@fiberlocator.com");
         tech1.setPassword(passwordEncoder.encode("tech123"));
         tech1.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech1.setActive(true);
 
         User tech2 = new User();
         tech2.setName("Mariana Souza");
         tech2.setEmail("mariana.souza@fiberlocator.com");
         tech2.setPassword(passwordEncoder.encode("tech123"));
         tech2.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech2.setActive(true);
 
         User tech3 = new User();
         tech3.setName("João Pereira");
         tech3.setEmail("joao.pereira@fiberlocator.com");
         tech3.setPassword(passwordEncoder.encode("tech123"));
         tech3.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech3.setActive(false);
 
         User tech4 = new User();
         tech4.setName("Ana Costa");
         tech4.setEmail("ana.costa@fiberlocator.com");
         tech4.setPassword(passwordEncoder.encode("tech123"));
-        tech4.setRoles(Set.of("ADMIN", "FIELD_TECHNICIAN"));
+        tech4.setRoles(Set.of("ADMIN"));
+        tech4.setActive(true);
 
-        return userRepository.saveAll(List.of(admin, tech1, tech2, tech3, tech4));
+        return userRepository.saveAll(List.of(god, admin, tech1, tech2, tech3, tech4));
     }
 
     private List<CEO> seedCEOs() {
@@ -104,6 +116,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.034647,-51.217659", "Avenida", "Ipiranga", "1200",
                 "Em frente ao posto de gasolina", "Praia de Belas", "Porto Alegre"));
         ceo1.setStatus(CEOStatus.STANDARDIZED);
+        ceo1.setActive(true);
 
 
         CEO ceo2 = new CEO();
@@ -113,6 +126,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.027699,-51.229752", "Rua", "Dos Andradas", "500",
                 "Ao lado da farmácia", "Centro Histórico", "Porto Alegre"));
         ceo2.setStatus(CEOStatus.DAMAGED);
+        ceo2.setActive(true);
 
         CEO ceo3 = new CEO();
         ceo3.setBoxNumber("CEO-003");
@@ -121,6 +135,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.037750,-51.212555", "Avenida", "Osvaldo Aranha", "800",
                 "Próximo ao ponto de ônibus", "Bom Fim", "Porto Alegre"));
         ceo3.setStatus(CEOStatus.UNDER_MAINTENANCE);
+        ceo3.setActive(true);
 
         CEO ceo4 = new CEO();
         ceo4.setBoxNumber("CEO-004");
@@ -129,6 +144,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.017685,-51.180279", "Rua", "Padre Chagas", "300",
                 "Em frente ao restaurante", "Moinhos de Vento", "Porto Alegre"));
         ceo4.setStatus(CEOStatus.CANCELLED);
+        ceo4.setActive(true);
 
         CEO ceo5 = new CEO();
         ceo5.setBoxNumber("CEO-005");
@@ -137,6 +153,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.043027,-51.220894", "Beco", "Do Salso", "45",
                 "Muro lateral do prédio", "Cidade Baixa", "Porto Alegre"));
         ceo5.setStatus(CEOStatus.STANDARDIZED);
+        ceo5.setActive(true);
 
         return ceoRepository.saveAll(List.of(ceo1, ceo2, ceo3, ceo4, ceo5));
     }
