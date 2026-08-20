@@ -116,7 +116,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.034647,-51.217659", "Avenida", "Ipiranga", "1200",
                 "Em frente ao posto de gasolina", "Praia de Belas", "Porto Alegre"));
         ceo1.setStatus(CEOStatus.STANDARDIZED);
-        ceo1.setActive(true);
 
 
         CEO ceo2 = new CEO();
@@ -126,7 +125,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.027699,-51.229752", "Rua", "Dos Andradas", "500",
                 "Ao lado da farmácia", "Centro Histórico", "Porto Alegre"));
         ceo2.setStatus(CEOStatus.DAMAGED);
-        ceo2.setActive(true);
 
         CEO ceo3 = new CEO();
         ceo3.setBoxNumber("CEO-003");
@@ -135,7 +133,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.037750,-51.212555", "Avenida", "Osvaldo Aranha", "800",
                 "Próximo ao ponto de ônibus", "Bom Fim", "Porto Alegre"));
         ceo3.setStatus(CEOStatus.UNDER_MAINTENANCE);
-        ceo3.setActive(true);
 
         CEO ceo4 = new CEO();
         ceo4.setBoxNumber("CEO-004");
@@ -144,7 +141,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.017685,-51.180279", "Rua", "Padre Chagas", "300",
                 "Em frente ao restaurante", "Moinhos de Vento", "Porto Alegre"));
         ceo4.setStatus(CEOStatus.CANCELLED);
-        ceo4.setActive(true);
 
         CEO ceo5 = new CEO();
         ceo5.setBoxNumber("CEO-005");
@@ -153,7 +149,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.043027,-51.220894", "Beco", "Do Salso", "45",
                 "Muro lateral do prédio", "Cidade Baixa", "Porto Alegre"));
         ceo5.setStatus(CEOStatus.STANDARDIZED);
-        ceo5.setActive(true);
 
         return ceoRepository.saveAll(List.of(ceo1, ceo2, ceo3, ceo4, ceo5));
     }

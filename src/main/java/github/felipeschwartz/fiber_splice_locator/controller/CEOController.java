@@ -66,7 +66,7 @@ public class CEOController implements CEOControllerDocs {
 
 
     @PutMapping(
-            value = "/{id}",
+            value = "/id/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -88,7 +88,7 @@ public class CEOController implements CEOControllerDocs {
     }
 
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/id/{id}")
     @Override
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
