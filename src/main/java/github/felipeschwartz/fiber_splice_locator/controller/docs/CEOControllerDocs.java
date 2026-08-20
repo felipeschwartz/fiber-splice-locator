@@ -1,6 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -109,6 +110,7 @@ public interface CEOControllerDocs {
             @org.springframework.web.bind.annotation.RequestBody
             @Valid CEODTO ceoDTO
     );
+
 
     @Operation(
             summary = "Deletes a ceo",

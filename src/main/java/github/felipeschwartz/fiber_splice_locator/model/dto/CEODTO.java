@@ -14,18 +14,16 @@ public class CEODTO extends RepresentationModel<CEODTO> implements Serializable 
     private String notes;
     private AddressDTO address;
     private CEOStatus status;
-    private Boolean active;
 
     public CEODTO() {
     }
 
-        public CEODTO(Long id, String boxNumber, String notes, AddressDTO address, CEOStatus status, Boolean active) {
+        public CEODTO(Long id, String boxNumber, String notes, AddressDTO address, CEOStatus status) {
         this.id = id;
         this.boxNumber = boxNumber;
         this.notes = notes;
         this.address = address;
         this.status = status;
-        this.active = active;
     }
 
     public Long getId() {
@@ -68,13 +66,6 @@ public class CEODTO extends RepresentationModel<CEODTO> implements Serializable 
         this.status = status;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -87,6 +87,7 @@ public class CEOController implements CEOControllerDocs {
         );
     }
 
+
     @DeleteMapping(value = "/{id}")
     @Override
     public ResponseEntity<Void> delete(@PathVariable Long id) {

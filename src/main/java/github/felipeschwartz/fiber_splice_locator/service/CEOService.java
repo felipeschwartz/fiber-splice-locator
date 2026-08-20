@@ -4,6 +4,7 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import github.felipeschwartz.fiber_splice_locator.controller.CEOController;
 import github.felipeschwartz.fiber_splice_locator.mapper.CEOMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;

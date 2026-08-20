@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public List<UserDTO> findAll() {
         logger.info("Finding all Users!");
         List<UserDTO> userDTOS = userRepository.findAll()
@@ -47,7 +47,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public UserDTO findById(Long id) {
         logger.info("Finding one User by ID: {}", id);
         User user = userRepository.findById(id)
@@ -60,7 +60,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public UserDTO create(UserDTO requestDTO) {
         logger.info("Creating a User: {}", requestDTO.getName());
         User user = userMapper.toEntity(requestDTO);
@@ -74,7 +74,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public UserDTO update(UserDTO updatedDTO) {
         logger.info("Updating User with ID: {}", updatedDTO.getId());
 
@@ -86,6 +86,19 @@ public class UserService {
         return updatedUserDTO;
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    public UserDTO disableUser(Long id) {
+        logger.info("Disabling User with ID: {}", id);
+        if (!userRepository.existsById(id)) {
+            throw new ObjectNotFoundException("User not found with ID: " + id);
+        }
+        userRepository.disableUserById(id);
+        var entity = userRepository.findById(id).get();
+        var updatedUserDTO = userMapper.toDTO(entity);
+        addHateoasLinks(updatedUserDTO);
+        return updatedUserDTO;
+    }
 
 
     @Transactional
@@ -105,6 +118,7 @@ public class UserService {
         dto.add(linkTo(methodOn(UserController.class).findAll()).withRel("findAllUsers").withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).create(null)).withRel("createUser").withType("POST"));
         dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), dto)).withRel("updateUser").withType("PUT"));
+        dto.add(linkTo(methodOn(UserController.class).disableUser(dto.getId())).withRel("disableUser").withType("PATCH"));
         dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("deleteUser").withType("DELETE"));
     }
 }

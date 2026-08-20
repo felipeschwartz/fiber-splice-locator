@@ -68,7 +68,7 @@ public class UserController implements UserControllerDocs {
     }
 
     @PutMapping(
-            value = "/{id}",
+            value = "/id/{id}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -87,6 +87,13 @@ public class UserController implements UserControllerDocs {
                         updatedUser.getLinks().stream().collect(Collectors.toList())
                 )
         );
+    }
+
+
+    @PatchMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public UserDTO disableUser(Long id) {
+        return service.disableUser(id);
     }
 
     @DeleteMapping(value = "/id/{id}")

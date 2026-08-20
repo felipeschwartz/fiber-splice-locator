@@ -108,6 +108,27 @@ public interface UserControllerDocs {
             @RequestBody @Valid UserDTO userDTO
     );
 
+
+    @Operation(
+            summary = "Disables a user",
+            description = "Disables a user identified by their ID.",
+            tags = {"User"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = @Content(schema = @Schema(implementation = UserDTO.class))
+                    ),
+                    @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    UserDTO disableUser(@PathVariable Long id);
+
+
     @Operation(
             summary = "Deletes a user",
             description = "Deletes a user identified by their ID.",
