@@ -5,6 +5,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.AddressDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.Address;
 import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,10 +46,10 @@ class CEOServiceTest {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
 
         address = new Address(1L, null, "Rua", "Rua dos Andradas", "500", null, "Centro", "Porto Alegre");
-        addressDTO = new AddressDTO("Rua dos Andradas", "500", null, "Porto Alegre", "RS", "90020-000", "Brasil");
+        addressDTO = new AddressDTO(1L, null, "Rua", "Rua dos Andradas", "500", null, "Centro", "Porto Alegre");
 
-        ceo = new CEO(1L, "CEO-001", "Caixa em bom estado", address);
-        ceoDTO = new CEODTO(1L, "CEO-001", "Caixa em bom estado", addressDTO);
+        ceo = new CEO(1L, "CEO-001", "Caixa em bom estado", address, CEOStatus.STANDARDIZED);
+        ceoDTO = new CEODTO(1L, "CEO-001", "Caixa em bom estado", addressDTO, CEOStatus.STANDARDIZED);
     }
 
     @Test
@@ -106,7 +107,7 @@ class CEOServiceTest {
 
     @Test
     void update_WhenCEODoesNotExist_ThrowsException() {
-        CEODTO nonExisting = new CEODTO(99L, "CEO-999", "x", addressDTO);
+        CEODTO nonExisting = new CEODTO(99L, "CEO-999", "x", addressDTO, CEOStatus.STANDARDIZED);
         when(ceoRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ObjectNotFoundException.class, () -> ceoService.update(nonExisting));

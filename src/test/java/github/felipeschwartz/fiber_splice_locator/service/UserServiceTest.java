@@ -45,8 +45,8 @@ class UserServiceTest {
     void setUp() {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
 
-        user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword");
-        userDTO = new UserDTO(1L, "Felipe Schwartz", "felipe@example.com", "123456");
+        user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword", true);
+        userDTO = new UserDTO(1L, "Felipe Schwartz", "felipe@example.com", "123456", true);
     }
 
     @Test
@@ -109,7 +109,7 @@ class UserServiceTest {
 
     @Test
     void update_WhenUserDoesNotExist_ThrowsException() {
-        UserDTO nonExisting = new UserDTO(99L, "Ghost", "ghost@example.com", "123456");
+        UserDTO nonExisting = new UserDTO(99L, "Ghost", "ghost@example.com", "123456", true);
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ObjectNotFoundException.class, () -> userService.update(nonExisting));

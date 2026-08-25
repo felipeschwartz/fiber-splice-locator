@@ -7,6 +7,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ServiceOrderServiceTest {
+class ServiceOrderServiceTest  {
 
     @Mock
     private ServiceOrderRepository serviceOrderRepository;
@@ -47,11 +48,11 @@ class ServiceOrderServiceTest {
     void setUp() {
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
 
-        CEO ceo = new CEO(1L, "CEO-001", "Observação", null);
-        CEODTO ceoDTO = new CEODTO(1L, "CEO-001", "Observação", null);
+        CEO ceo = new CEO(1L, "CEO-001", "Observação", null, CEOStatus.STANDARDIZED);
+        CEODTO ceoDTO = new CEODTO(1L, "CEO-001", "Observação", null, CEOStatus.STANDARDIZED);
 
-        User user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword");
-        UserDTO userDTO = new UserDTO(1L, "Felipe Schwartz", "felipe@example.com", "123456");
+        User user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword", true);
+        UserDTO userDTO = new UserDTO(1L, "Felipe Schwartz", "felipe@example.com", "123456", true);
 
         serviceOrder = new ServiceOrder(1L, ceo, ServiceOrderStatus.OPEN, user, LocalDateTime.now(), null);
         serviceOrderDTO = new ServiceOrderDTO(1L, ceoDTO, ServiceOrderStatus.OPEN, userDTO, new HashSet<>(), LocalDateTime.now(), null);

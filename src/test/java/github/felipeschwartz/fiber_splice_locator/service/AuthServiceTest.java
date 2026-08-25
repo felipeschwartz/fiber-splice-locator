@@ -31,7 +31,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword");
+        user = new User(1L, "Felipe Schwartz", "felipe@example.com", "encodedPassword", true);
     }
 
     @Test

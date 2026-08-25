@@ -47,7 +47,7 @@ class UserControllerIT {
                 1L,
                 "Felipe Schwartz",
                 "felipe@example.com",
-                "123456"
+                "123456", true
         );
     }
 
@@ -90,7 +90,8 @@ class UserControllerIT {
                 null,
                 "",
                 "invalido@example.com",
-                "123456"
+                "123456",
+                true
         );
 
         mockMvc.perform(post("/api/user/v1")
@@ -104,7 +105,7 @@ class UserControllerIT {
     void update_ReturnsOk() throws Exception {
         when(userService.update(any(UserDTO.class))).thenReturn(userDTO);
 
-        mockMvc.perform(put("/api/user/v1/{id}", 1L)
+        mockMvc.perform(put("/api/user/v1/id/{id}", 1L)
                         .with(user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDTO)))
@@ -116,7 +117,7 @@ class UserControllerIT {
         doNothing().when(userService).delete(1L);
 
         mockMvc.perform(delete("/api/user/v1/id/{id}", 1L)
-                        .with(user("admin").roles("ADMIN")))
+                        .with(user("god").roles("GOD_ADMIN")))
                 .andExpect(status().isNoContent());
     }
 

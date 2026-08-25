@@ -92,7 +92,7 @@ class ServiceOrderPhotoControllerIT {
         doNothing().when(photoService).delete(1L);
 
         mockMvc.perform(delete("/api/service_order_photos/v1/{id}", 1L)
-                        .with(user("admin").roles("ADMIN")))
+                        .with(user("god").roles("GOD_ADMIN")))
                 .andExpect(status().isNoContent());
     }
 
