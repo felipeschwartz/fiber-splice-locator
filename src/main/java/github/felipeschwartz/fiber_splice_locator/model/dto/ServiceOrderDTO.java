@@ -18,7 +18,7 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     private ServiceOrderStatus status;
     private UserDTO user;
     private Set<ServiceOrderPhotoDTO> serviceOrderPhotos = new HashSet<>();
-    private Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions = new HashSet<>();
+    private Set<ServiceOrderStatusDescriptionDTO> serviceOrderStatusDescriptions = new HashSet<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -75,11 +75,11 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
         this.serviceOrderPhotos = serviceOrderPhotos;
     }
 
-    public Set<ServiceOrderStatusDescription> getServiceOrderStatusDescriptions() {
+    public Set<ServiceOrderStatusDescriptionDTO> getServiceOrderStatusDescriptions() {
         return serviceOrderStatusDescriptions;
     }
 
-    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions) {
+    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescriptionDTO> serviceOrderStatusDescriptions) {
         this.serviceOrderStatusDescriptions = serviceOrderStatusDescriptions;
     }
 

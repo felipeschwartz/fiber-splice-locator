@@ -18,7 +18,7 @@ public class ServiceOrder implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long serviceOrderId;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "ceo_id",
             nullable = false,

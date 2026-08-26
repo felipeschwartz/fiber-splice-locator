@@ -1,16 +1,16 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
-import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-public class ServiceOrderStatusDescriptionDTO implements Serializable {
+public class ServiceOrderStatusDescriptionDTO extends RepresentationModel<ServiceOrderStatusDescriptionDTO> implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
-    private ServiceOrder serviceOrder;
+    private Long serviceOrderId;
     private String statusDescription;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -18,9 +18,9 @@ public class ServiceOrderStatusDescriptionDTO implements Serializable {
     public ServiceOrderStatusDescriptionDTO() {
     }
 
-    public ServiceOrderStatusDescriptionDTO(Long id, ServiceOrder serviceOrder, String statusDescription, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ServiceOrderStatusDescriptionDTO(Long id, Long serviceOrderId, String statusDescription, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.serviceOrder = serviceOrder;
+        this.serviceOrderId = serviceOrderId;
         this.statusDescription = statusDescription;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -34,12 +34,12 @@ public class ServiceOrderStatusDescriptionDTO implements Serializable {
         this.id = id;
     }
 
-    public ServiceOrder getServiceOrder() {
-        return serviceOrder;
+    public Long getServiceOrderId() {
+        return serviceOrderId;
     }
 
-    public void setServiceOrder(ServiceOrder serviceOrder) {
-        this.serviceOrder = serviceOrder;
+    public void setServiceOrderId(Long serviceOrderId) {
+        this.serviceOrderId = serviceOrderId;
     }
 
     public String getStatusDescription() {

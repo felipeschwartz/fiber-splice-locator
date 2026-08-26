@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -15,12 +16,13 @@ public class ServiceOrderStatusDescription implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(
             name = "service_order_id",
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_service_order_status_description_service_order")
     )
+    @JsonIgnore
     private ServiceOrder serviceOrder;
 
     @Column(name = "status_description", nullable = false)

@@ -6,6 +6,7 @@ import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
+import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderStatusDescriptionRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
     private final CEORepository ceoRepository;
     private final ServiceOrderRepository serviceOrderRepository;
     private final ServiceOrderPhotoRepository serviceOrderPhotoRepository;
+    private final ServiceOrderStatusDescriptionRepository serviceOrderStatusDescriptionRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DevDatabaseSeeder(
@@ -36,12 +38,14 @@ public class DevDatabaseSeeder implements CommandLineRunner {
             CEORepository ceoRepository,
             ServiceOrderRepository serviceOrderRepository,
             ServiceOrderPhotoRepository serviceOrderPhotoRepository,
+            ServiceOrderStatusDescriptionRepository serviceOrderStatusDescriptionRepository,
             PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.ceoRepository = ceoRepository;
         this.serviceOrderRepository = serviceOrderRepository;
         this.serviceOrderPhotoRepository = serviceOrderPhotoRepository;
+        this.serviceOrderStatusDescriptionRepository = serviceOrderStatusDescriptionRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -58,6 +62,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         List<CEO> ceos = seedCEOs();
         List<ServiceOrder> serviceOrders = seedServiceOrders(users, ceos);
         seedServiceOrderPhotos(serviceOrders);
+        seedServiceOrderStatusDescriptions(serviceOrders);
 
         logger.info("Development database seeded successfully!");
     }
@@ -116,7 +121,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "-30.034647,-51.217659", "Avenida", "Ipiranga", "1200",
                 "Em frente ao posto de gasolina", "Praia de Belas", "Porto Alegre"));
         ceo1.setStatus(CEOStatus.STANDARDIZED);
-
 
         CEO ceo2 = new CEO();
         ceo2.setBoxNumber("CEO-002");
@@ -213,5 +217,27 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         photo.setPhotoOrder(photoOrder);
         photo.setCreatedAt(LocalDateTime.now());
         return photo;
+    }
+
+    private void seedServiceOrderStatusDescriptions(List<ServiceOrder> serviceOrders) {
+        List<ServiceOrderStatusDescription> descriptions = List.of(
+                buildStatusDescription(serviceOrders.get(0), "Ordem de serviço aberta, aguardando atendimento.", LocalDateTime.now().minusDays(5)),
+                buildStatusDescription(serviceOrders.get(1), "Técnico em deslocamento até o local.", LocalDateTime.now().minusDays(4)),
+                buildStatusDescription(serviceOrders.get(1), "Manutenção iniciada na caixa CEO-002.", LocalDateTime.now().minusDays(4).plusHours(2)),
+                buildStatusDescription(serviceOrders.get(2), "Serviço concluído com sucesso.", LocalDateTime.now().minusDays(3)),
+                buildStatusDescription(serviceOrders.get(3), "Ordem de serviço cancelada pelo cliente.", LocalDateTime.now().minusDays(2)),
+                buildStatusDescription(serviceOrders.get(4), "Ordem de serviço aberta, aguardando atendimento.", LocalDateTime.now().minusDays(1))
+        );
+
+        serviceOrderStatusDescriptionRepository.saveAll(descriptions);
+    }
+
+    private ServiceOrderStatusDescription buildStatusDescription(ServiceOrder serviceOrder, String statusDescription, LocalDateTime createdAt) {
+        ServiceOrderStatusDescription description = new ServiceOrderStatusDescription();
+        description.setServiceOrder(serviceOrder);
+        description.setStatusDescription(statusDescription);
+        description.setCreatedAt(createdAt);
+        description.setUpdatedAt(createdAt);
+        return description;
     }
 }
