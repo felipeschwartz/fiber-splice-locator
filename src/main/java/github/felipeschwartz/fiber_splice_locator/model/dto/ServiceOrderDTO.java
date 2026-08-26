@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
+import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderStatusDescription;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -17,6 +18,7 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     private ServiceOrderStatus status;
     private UserDTO user;
     private Set<ServiceOrderPhotoDTO> serviceOrderPhotos = new HashSet<>();
+    private Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions = new HashSet<>();
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -71,6 +73,14 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
 
     public void setServiceOrderPhotos(Set<ServiceOrderPhotoDTO> serviceOrderPhotos) {
         this.serviceOrderPhotos = serviceOrderPhotos;
+    }
+
+    public Set<ServiceOrderStatusDescription> getServiceOrderStatusDescriptions() {
+        return serviceOrderStatusDescriptions;
+    }
+
+    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions) {
+        this.serviceOrderStatusDescriptions = serviceOrderStatusDescriptions;
     }
 
     public LocalDateTime getCreatedAt() {

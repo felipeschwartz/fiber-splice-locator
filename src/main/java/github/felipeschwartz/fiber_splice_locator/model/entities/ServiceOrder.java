@@ -41,6 +41,9 @@ public class ServiceOrder implements Serializable {
     @OneToMany(mappedBy = "serviceOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ServiceOrderPhoto> serviceOrderPhotos = new HashSet<>();
 
+    @OneToMany(mappedBy = "serviceOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions = new HashSet<>();
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -97,6 +100,14 @@ public class ServiceOrder implements Serializable {
 
     public void setServiceOrderPhotos(Set<ServiceOrderPhoto> serviceOrderPhotos) {
         this.serviceOrderPhotos = serviceOrderPhotos;
+    }
+
+    public Set<ServiceOrderStatusDescription> getServiceOrderStatusDescriptions() {
+        return serviceOrderStatusDescriptions;
+    }
+
+    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescription> serviceOrderStatusDescriptions) {
+        this.serviceOrderStatusDescriptions = serviceOrderStatusDescriptions;
     }
 
     public LocalDateTime getCreatedAt() {

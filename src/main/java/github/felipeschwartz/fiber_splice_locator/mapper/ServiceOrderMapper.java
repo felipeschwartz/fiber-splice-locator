@@ -9,7 +9,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = { UserMapper.class, AddressMapper.class, CEOMapper.class, ServiceOrderPhotoMapper.class }
+        uses = { UserMapper.class, AddressMapper.class, CEOMapper.class, ServiceOrderPhotoMapper.class, ServiceOrderStatusDescriptionMapper.class }
 )
 public interface ServiceOrderMapper {
 

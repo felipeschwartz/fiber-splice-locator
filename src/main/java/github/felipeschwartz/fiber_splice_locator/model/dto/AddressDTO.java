@@ -1,7 +1,5 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
-import jakarta.persistence.Column;
-
 public class AddressDTO {
 
     private Long id;
