@@ -3,6 +3,9 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import github.felipeschwartz.fiber_splice_locator.controller.ServiceOrderController;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
+import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderStatusDescription;
+import java.time.LocalDateTime;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
@@ -73,6 +76,31 @@ public class ServiceOrderService {
         ServiceOrderDTO updatedServiceOrderDTO = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
         addHateoasLinks(updatedServiceOrderDTO);
         return updatedServiceOrderDTO;
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public ServiceOrderDTO attend(Long id, ServiceOrderAttendanceDTO request) {
+        var entity = serviceOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+        if (request.getStatus() == null) throw new IllegalArgumentException("Status is required");
+        if (request.getStatusDescription() == null || request.getStatusDescription().isBlank()) {
+            throw new IllegalArgumentException("Status description is required");
+        }
+        entity.setStatus(request.getStatus());
+        entity.setUpdatedAt(LocalDateTime.now());
+        ServiceOrderStatusDescription description = new ServiceOrderStatusDescription();
+        description.setServiceOrder(entity);
+        description.setStatusDescription(request.getStatusDescription().trim());
+        description.setCreatedAt(LocalDateTime.now());
+        entity.getServiceOrderStatusDescriptions().add(description);
+        if (request.getGeoLocation() != null && !request.getGeoLocation().isBlank()
+                && entity.getCeo() != null && entity.getCeo().getAddress() != null) {
+            entity.getCeo().getAddress().setGeoLocation(request.getGeoLocation().trim());
+        }
+        ServiceOrderDTO result = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
+        addHateoasLinks(result);
+        return result;
     }
 
     @Transactional

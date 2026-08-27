@@ -2,6 +2,7 @@ package github.felipeschwartz.fiber_splice_locator.controller;
 
 import github.felipeschwartz.fiber_splice_locator.controller.docs.ServiceOrderControllerDocs;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.service.ServiceOrderService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -66,6 +67,17 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
         ServiceOrderDTO updated = service.update(id, serviceOrderDTO);
         return ResponseEntity.ok(updated);
     }
+
+    @PostMapping(value = "/{id}/attendance",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<ServiceOrderDTO> attend(
+            @PathVariable("id") Long id, @RequestBody ServiceOrderAttendanceDTO request
+    ) {
+        return ResponseEntity.ok(service.attend(id, request));
+    }
+
 
     @DeleteMapping("/{id}")
     @Override

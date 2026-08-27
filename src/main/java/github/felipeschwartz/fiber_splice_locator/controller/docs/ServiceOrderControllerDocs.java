@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
+import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -96,6 +97,29 @@ public interface ServiceOrderControllerDocs {
             }
     )
     ResponseEntity<ServiceOrderDTO> update(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO serviceOrderDTO);
+
+    @Operation(
+            summary = "Updates the attendance information for an existing service order",
+            description = "Updates the attendance information for an existing service order identified by its ID.",
+            tags = {"Service Orders"},
+            requestBody = @RequestBody(
+                    description = "Updated service order attendance details",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ServiceOrderDTO.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))
+                    ),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderAttendanceDTO request);
 
     @Operation(
             summary = "Deletes a service order",
