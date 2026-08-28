@@ -126,7 +126,7 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    UserDTO disableUser(@PathVariable Long id);
+    ResponseEntity<Void> disableUser(@PathVariable Long id);
 
 
     @Operation(

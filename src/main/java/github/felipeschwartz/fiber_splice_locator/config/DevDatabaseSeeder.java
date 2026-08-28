@@ -231,7 +231,6 @@ public class DevDatabaseSeeder implements CommandLineRunner {
 
         serviceOrderStatusDescriptionRepository.saveAll(descriptions);
     }
-
     private ServiceOrderStatusDescription buildStatusDescription(ServiceOrder serviceOrder, String statusDescription, LocalDateTime createdAt) {
         ServiceOrderStatusDescription description = new ServiceOrderStatusDescription();
         description.setServiceOrder(serviceOrder);

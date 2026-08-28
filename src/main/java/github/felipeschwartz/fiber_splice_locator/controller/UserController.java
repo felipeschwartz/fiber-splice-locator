@@ -90,10 +90,11 @@ public class UserController implements UserControllerDocs {
     }
 
 
-    @PatchMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/id/{id}/disable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public UserDTO disableUser(Long id) {
-        return service.disableUser(id);
+    public ResponseEntity<Void> disableUser(@PathVariable("id") Long id) {
+        service.disableUser(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping(value = "/id/{id}")

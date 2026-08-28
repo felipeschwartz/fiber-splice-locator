@@ -84,6 +84,39 @@ public class CEOService {
     }
 
 
+    public List<CEODTO> findByBoxNumber(String boxNumber) {
+        logger.info("Finding CEOs by box number: {}", boxNumber);
+        if (boxNumber == null || boxNumber.isBlank()) {
+            throw new IllegalArgumentException("boxNumber must not be blank");
+        }
+
+        return ceoRepository.findByBoxNumberContainingIgnoreCase(boxNumber.trim())
+                .stream()
+                .map(ceoMapper::toDTO)
+                .toList();
+    }
+
+    public List<CEODTO> search(String query) {
+        if (query == null || query.isBlank()) {
+            return ceoRepository.findAll()
+                    .stream()
+                    .map(ceoMapper::toDTO)
+                    .toList();
+        }
+
+        String normalized = query.trim();
+        List<CEODTO> byBoxNumber = findByBoxNumber(normalized);
+
+        try {
+            Long id = Long.valueOf(normalized);
+            return ceoRepository.findById(id)
+                    .map(ceo -> List.of(ceoMapper.toDTO(ceo)))
+                    .orElse(byBoxNumber);
+        } catch (NumberFormatException ignored) {
+            return byBoxNumber;
+        }
+    }
+
 
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN')")

@@ -50,6 +50,21 @@ public class CEOController implements CEOControllerDocs {
         return ResponseEntity.ok(EntityModel.of(ceoDTO, ceoDTO.getLinks().stream().collect(Collectors.toList())));
     }
 
+    @GetMapping("/box-number/{boxNumber}")
+    @Override
+    public ResponseEntity<List<CEODTO>> findByBoxNumber(
+            @PathVariable String boxNumber) {
+        return ResponseEntity.ok(service.findByBoxNumber(boxNumber));
+    }
+
+    @GetMapping("/search")
+    @Override
+    public ResponseEntity<List<CEODTO>> search(
+            @RequestParam("q") String query) {
+        return ResponseEntity.ok(service.search(query));
+    }
+
+
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE

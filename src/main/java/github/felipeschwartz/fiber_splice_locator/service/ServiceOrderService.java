@@ -4,9 +4,15 @@ import github.felipeschwartz.fiber_splice_locator.controller.ServiceOrderControl
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
+import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
+import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderStatusDescription;
 import java.time.LocalDateTime;
+
+import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
+import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +32,14 @@ public class ServiceOrderService {
 
     private final ServiceOrderRepository serviceOrderRepository;
     private final ServiceOrderMapper serviceOrderMapper;
+    private final CEORepository ceoRepository;
+    private final UserRepository userRepository;
 
-    public ServiceOrderService(ServiceOrderRepository serviceOrderRepository, ServiceOrderMapper serviceOrderMapper) {
+    public ServiceOrderService(ServiceOrderRepository serviceOrderRepository, ServiceOrderMapper serviceOrderMapper, CEORepository ceoRepository, UserRepository userRepository) {
         this.serviceOrderRepository = serviceOrderRepository;
         this.serviceOrderMapper = serviceOrderMapper;
+        this.ceoRepository = ceoRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional(readOnly = true)
@@ -58,9 +68,17 @@ public class ServiceOrderService {
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO create(ServiceOrderDTO serviceOrderDTO) {
         logger.info("Creating one Service Order!");
-        ServiceOrderDTO createdServiceOrderDTO = serviceOrderMapper.toDTO(
-                serviceOrderRepository.save(serviceOrderMapper.toEntity(serviceOrderDTO))
-        );
+        ServiceOrder entity = serviceOrderMapper.toEntity(serviceOrderDTO);
+        Long ceoId = serviceOrderDTO.getCeo() == null ? null : serviceOrderDTO.getCeo().getId();
+        Long userId = serviceOrderDTO.getUser() == null ? null : serviceOrderDTO.getUser().getId();
+        if (ceoId == null || userId == null) throw new IllegalArgumentException("CEO and user are required");
+        CEO ceo = ceoRepository.findById(ceoId).orElseThrow(() -> new EntityNotFoundException("CEO not found: " + ceoId));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+        entity.setCeo(ceo);
+        entity.setUser(user);
+        entity.setCreatedAt(java.time.LocalDateTime.now());
+        entity.setUpdatedAt(java.time.LocalDateTime.now());
+        ServiceOrderDTO createdServiceOrderDTO = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
         addHateoasLinks(createdServiceOrderDTO);
         return createdServiceOrderDTO;
     }
