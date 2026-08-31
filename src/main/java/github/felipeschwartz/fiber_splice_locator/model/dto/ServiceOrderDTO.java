@@ -1,6 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
-import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderStatusDescription;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -15,6 +15,7 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
 
     private Long serviceOrderId;
     private CEODTO ceo;
+    private CEOStatus ceoStatus;
     private ServiceOrderStatus status;
     private UserDTO user;
     private Set<ServiceOrderPhotoDTO> serviceOrderPhotos = new HashSet<>();
@@ -25,7 +26,9 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     public ServiceOrderDTO() {
     }
 
-    public ServiceOrderDTO(Long serviceOrderId, CEODTO ceo, ServiceOrderStatus status, UserDTO user, Set<ServiceOrderPhotoDTO> serviceOrderPhotos, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public ServiceOrderDTO(Long serviceOrderId, CEODTO ceo, ServiceOrderStatus status,
+                           UserDTO user, Set<ServiceOrderPhotoDTO> serviceOrderPhotos,
+                           LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.serviceOrderId = serviceOrderId;
         this.ceo = ceo;
         this.status = status;
@@ -35,69 +38,32 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
         this.updatedAt = updatedAt;
     }
 
-    public Long getServiceOrderId() {
-        return serviceOrderId;
-    }
+    public Long getServiceOrderId() { return serviceOrderId; }
+    public void setServiceOrderId(Long serviceOrderId) { this.serviceOrderId = serviceOrderId; }
 
-    public void setServiceOrderId(Long serviceOrderId) {
-        this.serviceOrderId = serviceOrderId;
-    }
+    public CEODTO getCeo() { return ceo; }
+    public void setCeo(CEODTO ceo) { this.ceo = ceo; }
 
-    public CEODTO getCeo() {
-        return ceo;
-    }
+    public CEOStatus getCeoStatus() { return ceoStatus; }
+    public void setCeoStatus(CEOStatus ceoStatus) { this.ceoStatus = ceoStatus; }
 
-    public void setCeo(CEODTO ceo) {
-        this.ceo = ceo;
-    }
+    public ServiceOrderStatus getStatus() { return status; }
+    public void setStatus(ServiceOrderStatus status) { this.status = status; }
 
-    public ServiceOrderStatus getStatus() {
-        return status;
-    }
+    public UserDTO getUser() { return user; }
+    public void setUser(UserDTO user) { this.user = user; }
 
-    public void setStatus(ServiceOrderStatus status) {
-        this.status = status;
-    }
+    public Set<ServiceOrderPhotoDTO> getServiceOrderPhotos() { return serviceOrderPhotos; }
+    public void setServiceOrderPhotos(Set<ServiceOrderPhotoDTO> serviceOrderPhotos) { this.serviceOrderPhotos = serviceOrderPhotos; }
 
-    public UserDTO getUser() {
-        return user;
-    }
+    public Set<ServiceOrderStatusDescriptionDTO> getServiceOrderStatusDescriptions() { return serviceOrderStatusDescriptions; }
+    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescriptionDTO> descriptions) { this.serviceOrderStatusDescriptions = descriptions; }
 
-    public void setUser(UserDTO user) {
-        this.user = user;
-    }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public Set<ServiceOrderPhotoDTO> getServiceOrderPhotos() {
-        return serviceOrderPhotos;
-    }
-
-    public void setServiceOrderPhotos(Set<ServiceOrderPhotoDTO> serviceOrderPhotos) {
-        this.serviceOrderPhotos = serviceOrderPhotos;
-    }
-
-    public Set<ServiceOrderStatusDescriptionDTO> getServiceOrderStatusDescriptions() {
-        return serviceOrderStatusDescriptions;
-    }
-
-    public void setServiceOrderStatusDescriptions(Set<ServiceOrderStatusDescriptionDTO> serviceOrderStatusDescriptions) {
-        this.serviceOrderStatusDescriptions = serviceOrderStatusDescriptions;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     @Override
     public boolean equals(Object o) {
@@ -107,7 +73,5 @@ public class ServiceOrderDTO extends RepresentationModel<ServiceOrderDTO> implem
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(getServiceOrderId());
-    }
+    public int hashCode() { return Objects.hashCode(getServiceOrderId()); }
 }
