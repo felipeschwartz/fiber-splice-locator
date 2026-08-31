@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
@@ -17,6 +18,13 @@ public class CustomUserDetails implements UserDetails {
     private String email;
     @Getter
     private String password;
+    @Getter
+    private String name;
+
+    @Getter
+    private Set<String> roles;
+    @Getter
+    private Collection<GrantedAuthority> authorities;
 
     @Getter
     private boolean active;
@@ -26,9 +34,11 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
+        this.name = user.getName();
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.active = user.getActive();
+        this.roles = user.getRoles();
         this.authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(
                         role.startsWith("ROLE_") ? role : "ROLE_" + role
