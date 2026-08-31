@@ -66,8 +66,12 @@ public class SecurityConfigDev {
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/user/v1/**"
-                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
+                                "/api/user/v1/me",
+                                "/api/user/v1/search"
+                        ).authenticated()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/user/v1/**")
+                        .hasAnyRole("GOD_ADMIN", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.POST,

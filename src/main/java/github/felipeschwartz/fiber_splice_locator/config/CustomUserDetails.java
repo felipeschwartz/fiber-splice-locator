@@ -23,8 +23,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Getter
     private Set<String> roles;
-    @Getter
-    private Collection<GrantedAuthority> authorities;
 
     @Getter
     private boolean active;

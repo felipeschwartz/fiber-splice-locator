@@ -1,8 +1,11 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.docs.UserControllerDocs;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSummaryDTO;
 import github.felipeschwartz.fiber_splice_locator.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -10,6 +13,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -49,6 +53,19 @@ public class UserController implements UserControllerDocs {
     public ResponseEntity<EntityModel<UserDTO>> findById(@PathVariable Long id) {
         UserDTO userDTO = service.findById(id);
         return ResponseEntity.ok(EntityModel.of(userDTO, userDTO.getLinks().stream().collect(Collectors.toList())));
+    }
+
+    @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserSummaryDTO> me(@AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(new UserSummaryDTO(
+                principal.getId(), principal.getName(), principal.getEmail(), principal.getRoles()
+        ));
+    }
+
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserSearchResultDTO>> search(@RequestParam("q") String q) {
+        return ResponseEntity.ok(service.search(q));
     }
 
 

@@ -4,6 +4,7 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import github.felipeschwartz.fiber_splice_locator.controller.UserController;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
@@ -57,6 +58,18 @@ public class UserService {
         return userDTO;
     }
 
+    @Transactional(readOnly = true)
+    public List<UserSearchResultDTO> search(String query) {
+        logger.info("Searching for Users by query: {}", query);
+        String value = query == null ? "" : query.trim();
+        List<User> results = value.matches("\\d+")
+                ? userRepository.findById(Long.parseLong(value)).map(List::of).orElseGet(List::of)
+                : userRepository.findByNameContainingIgnoreCase(value);
+        return results.stream()
+                .map(u -> new UserSearchResultDTO(u.getId(), u.getName(), u.getEmail()))
+                .collect(Collectors.toList());
+    }
+
 
 
     @Transactional
@@ -65,6 +78,7 @@ public class UserService {
         logger.info("Creating a User: {}", requestDTO.getName());
         User user = userMapper.toEntity(requestDTO);
         user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
+        user.setRoles(requestDTO.getRoles());
         User savedUser = userRepository.save(user);
         UserDTO createdUserDTO = userMapper.toDTO(savedUser);
         addHateoasLinks(createdUserDTO);
