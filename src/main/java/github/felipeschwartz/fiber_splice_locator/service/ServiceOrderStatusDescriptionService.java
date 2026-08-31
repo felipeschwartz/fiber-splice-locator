@@ -42,6 +42,17 @@ public class ServiceOrderStatusDescriptionService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public List<ServiceOrderStatusDescriptionDTO> findByServiceOrderId(Long serviceOrderId) {
+        logger.info("Finding Service Order Status Descriptions for service order {}", serviceOrderId);
+        List<ServiceOrderStatusDescriptionDTO> list = service.findByServiceOrder_ServiceOrderIdOrderByCreatedAtAsc(serviceOrderId).stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+        list.forEach(this::addHateoasLinks);
+        return list;
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderStatusDescriptionDTO findById(Long id) {
         logger.info("Finding Service Order Status Description with id {}", id);
         ServiceOrderStatusDescriptionDTO serviceOrderDTO = service.findById(id)

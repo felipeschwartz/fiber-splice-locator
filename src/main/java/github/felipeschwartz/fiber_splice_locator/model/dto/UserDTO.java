@@ -1,5 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.hateoas.RepresentationModel;
@@ -21,6 +23,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
     private String email;
 
     @NotBlank(message = "Password cannot be blank")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private Set<String> roles = new HashSet<>();

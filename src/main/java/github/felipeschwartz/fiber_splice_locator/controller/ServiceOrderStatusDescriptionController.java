@@ -31,6 +31,11 @@ public class ServiceOrderStatusDescriptionController implements ServiceOrderStat
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping(value = "/service-order/{serviceOrderId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ServiceOrderStatusDescriptionDTO>> findByServiceOrder(@PathVariable Long serviceOrderId) {
+        return ResponseEntity.ok(service.findByServiceOrderId(serviceOrderId));
+    }
+
     @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ServiceOrderStatusDescriptionDTO> findById(@PathVariable("id") Long id) {
