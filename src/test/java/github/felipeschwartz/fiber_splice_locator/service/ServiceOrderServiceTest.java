@@ -9,7 +9,9 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
+import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
+import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,12 @@ class ServiceOrderServiceTest  {
 
     @Mock
     private ServiceOrderMapper serviceOrderMapper;
+
+    @Mock
+    private CEORepository ceoRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     private ServiceOrderService serviceOrderService;
@@ -89,14 +97,15 @@ class ServiceOrderServiceTest  {
 
     @Test
     void create_ReturnsCreatedServiceOrderDTO() {
-        when(serviceOrderMapper.toEntity(serviceOrderDTO)).thenReturn(serviceOrder);
-        when(serviceOrderRepository.save(serviceOrder)).thenReturn(serviceOrder);
+        when(ceoRepository.findById(1L)).thenReturn(Optional.of(serviceOrder.getCeo()));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(serviceOrder.getUser()));
+        when(serviceOrderRepository.save(any(ServiceOrder.class))).thenReturn(serviceOrder);
         when(serviceOrderMapper.toDTO(serviceOrder)).thenReturn(serviceOrderDTO);
 
         ServiceOrderDTO result = serviceOrderService.create(serviceOrderDTO);
 
         assertNotNull(result);
-        verify(serviceOrderRepository, times(1)).save(serviceOrder);
+        verify(serviceOrderRepository, times(1)).save(any(ServiceOrder.class));
     }
 
     @Test
