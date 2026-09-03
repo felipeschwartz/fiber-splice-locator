@@ -1,6 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidResetTokenException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -78,5 +79,17 @@ public class ControllerExceptionHandler {
         return ResponseEntity
                 .status(status)
                 .body(error);
+    }
+
+    @ExceptionHandler(InvalidResetTokenException.class)
+    public ResponseEntity<StandardError> invalidResetToken(
+            InvalidResetTokenException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError error = new StandardError(
+                System.currentTimeMillis(), status.value(), "Invalid Reset Token", exception.getMessage(), request.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(error);
     }
 }
