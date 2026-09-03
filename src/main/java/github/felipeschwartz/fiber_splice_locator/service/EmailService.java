@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,6 +17,12 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
+    // @Async: o envio via SMTP externo (ex.: Ethereal) pode levar vários
+    // segundos (DNS + handshake TLS + conversa SMTP) — se isso rodasse na
+    // mesma thread do request HTTP, o app podia estourar o timeout do
+    // axios (15s) esperando a resposta, mesmo com o e-mail sendo enviado
+    // com sucesso logo em seguida.
+    @Async
     public void sendPasswordResetCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
