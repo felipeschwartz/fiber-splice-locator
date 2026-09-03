@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.controller;
 
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.docs.UserControllerDocs;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserSummaryDTO;
@@ -111,6 +112,16 @@ public class UserController implements UserControllerDocs {
     @Override
     public ResponseEntity<Void> disableUser(@PathVariable("id") Long id) {
         service.disableUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/me/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<Void> changeOwnPassword(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody @Valid ChangePasswordDTO dto
+    ) {
+        service.changeOwnPassword(principal.getId(), dto);
         return ResponseEntity.noContent().build();
     }
 

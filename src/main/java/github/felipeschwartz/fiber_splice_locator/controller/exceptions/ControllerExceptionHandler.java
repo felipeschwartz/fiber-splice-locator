@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -57,5 +58,25 @@ public class ControllerExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(response);
+    }
+
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    public ResponseEntity<StandardError> invalidCurrentPassword(
+            InvalidCurrentPasswordException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+
+        StandardError error = new StandardError(
+                System.currentTimeMillis(),
+                status.value(),
+                "Invalid Current Password",
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(status)
+                .body(error);
     }
 }

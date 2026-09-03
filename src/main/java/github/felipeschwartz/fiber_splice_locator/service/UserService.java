@@ -3,10 +3,12 @@ package github.felipeschwartz.fiber_splice_locator.service;
 
 import github.felipeschwartz.fiber_splice_locator.controller.UserController;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +114,21 @@ public class UserService {
         var updatedUserDTO = userMapper.toDTO(entity);
         addHateoasLinks(updatedUserDTO);
         return updatedUserDTO;
+    }
+
+    @Transactional
+    public void changeOwnPassword(Long id, ChangePasswordDTO dto) {
+        logger.info("Changing password for User with ID: {}", id);
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User", id));
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new InvalidCurrentPasswordException();
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 
 

@@ -1,5 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -127,6 +129,25 @@ public interface UserControllerDocs {
             }
     )
     ResponseEntity<Void> disableUser(@PathVariable Long id);
+
+
+    @Operation(
+            summary = "Changes the authenticated user's own password",
+            description = "Validates the current password and updates it to the new one.",
+            tags = {"User"},
+            requestBody = @RequestBody(
+                    description = "Current and new password",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ChangePasswordDTO.class))
+            ),
+            responses = {
+                    @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<Void> changeOwnPassword(CustomUserDetails principal, @Valid ChangePasswordDTO dto);
 
 
     @Operation(

@@ -69,6 +69,10 @@ public class SecurityConfigDev {
                                 "/api/user/v1/me",
                                 "/api/user/v1/search"
                         ).authenticated()
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/user/v1/me/password"
+                        ).authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/user/v1/**")
                         .hasAnyRole("GOD_ADMIN", "ADMIN")
