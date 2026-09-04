@@ -6,11 +6,12 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderPhoto;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
-
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,17 +65,24 @@ public class ServiceOrderPhotoService {
             throw new EntityNotFoundException("Service order not found: " + serviceOrderId);
         }
         return photoRepository.findByServiceOrder_ServiceOrderId(serviceOrderId).stream()
-                .map(photoMapper::toDTO)
+                .map(entity -> {
+                            ServiceOrderPhotoDTO dto = photoMapper.toDTO(entity);
+                            attachContentUrl(dto);
+                            return dto;
+                        })
                 .collect(Collectors.toList());
+
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderPhotoDTO findById(Long id) {
         logger.info("Finding photo with id {}", id);
-        return photoRepository.findById(id)
+        ServiceOrderPhotoDTO dto = photoRepository.findById(id)
                 .map(photoMapper::toDTO)
                 .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
+        attachContentUrl(dto);
+        return dto;
     }
 
     @Transactional
@@ -113,7 +121,9 @@ public class ServiceOrderPhotoService {
 
         ServiceOrderPhoto saved = photoRepository.save(photo);
         logger.info("Photo {} stored for Service Order {}", saved.getServiceOrderPhotoId(), serviceOrderId);
-        return photoMapper.toDTO(saved);
+        ServiceOrderPhotoDTO dto = photoMapper.toDTO(saved);
+        attachContentUrl(dto);
+        return dto;
     }
 
     @Transactional
@@ -123,7 +133,9 @@ public class ServiceOrderPhotoService {
         ServiceOrderPhoto entity = photoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
         photoMapper.updateEntityFromDTO(dto, entity);
-        return photoMapper.toDTO(photoRepository.save(entity));
+        ServiceOrderPhotoDTO saved = photoMapper.toDTO(photoRepository.save(entity));
+        attachContentUrl(saved);
+        return saved;
     }
 
     @Transactional
@@ -143,6 +155,21 @@ public class ServiceOrderPhotoService {
         photoRepository.delete(photo);
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public LoadedPhoto loadContent(Long id) {
+        logger.info("Loading photo content for id {}", id);
+        ServiceOrderPhoto photo = photoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
+
+        Path file = storageRoot.resolve(photo.getStoragePath()).normalize();
+        if (!file.startsWith(storageRoot) || !Files.exists(file)) {
+            throw new EntityNotFoundException("Photo file not found on disk: " + id);
+        }
+
+        return new LoadedPhoto(new FileSystemResource(file), photo.getContentType());
+    }
+
     private void validateFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("The uploaded file is empty");
@@ -155,5 +182,15 @@ public class ServiceOrderPhotoService {
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("The image size exceeds the allowed limit");
         }
+    }
+
+    public record LoadedPhoto(Resource resource, String contentType) {}
+
+    private void attachContentUrl(ServiceOrderPhotoDTO dto) {
+        String url = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/service_order_photos/v1/{id}/content")
+                .buildAndExpand(dto.getId())
+                .toUriString();
+        dto.setContentUrl(url);
     }
 }

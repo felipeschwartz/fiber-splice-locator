@@ -18,6 +18,7 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
     private Long fileSize;
     private Integer photoOrder;
     private LocalDateTime createdAt;
+    private String contentUrl;
 
     public ServiceOrderPhotoDTO() {
     }
@@ -104,6 +105,14 @@ public class ServiceOrderPhotoDTO extends RepresentationModel<ServiceOrderPhotoD
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getContentUrl() {
+        return contentUrl;
+    }
+
+    public void setContentUrl(String contentUrl) {
+        this.contentUrl = contentUrl;
     }
 
     @Override

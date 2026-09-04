@@ -6,6 +6,7 @@ import github.felipeschwartz.fiber_splice_locator.service.ServiceOrderPhotoServi
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,14 @@ public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerD
     @Override
     public ResponseEntity<ServiceOrderPhotoDTO> findById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @GetMapping("/{id}/content")
+    public ResponseEntity<Resource> content(@PathVariable("id") Long id) {
+        ServiceOrderPhotoService.LoadedPhoto loaded = service.loadContent(id);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(loaded.contentType()))
+                .body(loaded.resource());
     }
 
     @PostMapping(
