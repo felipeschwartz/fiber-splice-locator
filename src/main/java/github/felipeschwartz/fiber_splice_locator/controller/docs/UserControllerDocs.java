@@ -3,6 +3,8 @@ package github.felipeschwartz.fiber_splice_locator.controller.docs;
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSummaryDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +17,9 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 public interface UserControllerDocs {
     @Operation(
@@ -57,7 +62,39 @@ public interface UserControllerDocs {
     )
     ResponseEntity<EntityModel<UserDTO>> findById(@PathVariable Long id);
 
+    @Operation(
+            summary = "Finds the authenticated user",
+            description = "Returns id, name, email and roles of the currently authenticated user, resolved from the JWT.",
+            tags = {"User"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = @Content(schema = @Schema(implementation = UserSummaryDTO.class))
+                    ),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<UserSummaryDTO> me(CustomUserDetails principal);
 
+    @Operation(
+            summary = "Searches users",
+            description = "Searches users by ID (if the query is numeric) or by name (case-insensitive, partial match). Returns only id, name and email by design.",
+            tags = {"User"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = @Content(
+                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    array = @ArraySchema(schema = @Schema(implementation = UserSearchResultDTO.class)))
+                    ),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<List<UserSearchResultDTO>> search(@RequestParam("q") String q);
 
     @Operation(
             summary = "Creates a new user",

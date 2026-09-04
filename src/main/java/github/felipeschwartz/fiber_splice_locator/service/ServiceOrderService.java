@@ -58,6 +58,16 @@ public class ServiceOrderService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public List<ServiceOrderDTO> findByCeoId(Long ceoId) {
+        List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findByCeo_IdOrderByCreatedAtDesc(ceoId).stream()
+                .map(serviceOrderMapper::toDTO)
+                .collect(Collectors.toList());
+        serviceOrders.forEach(this::addHateoasLinks);
+        return serviceOrders;
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO findById(Long id) {
         ServiceOrderDTO dto = serviceOrderRepository.findById(id)
                 .map(serviceOrderMapper::toDTO)

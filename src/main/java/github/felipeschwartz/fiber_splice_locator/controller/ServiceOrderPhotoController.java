@@ -42,6 +42,7 @@ public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerD
     }
 
     @GetMapping("/{id}/content")
+    @Override
     public ResponseEntity<Resource> content(@PathVariable("id") Long id) {
         ServiceOrderPhotoService.LoadedPhoto loaded = service.loadContent(id);
         return ResponseEntity.ok()

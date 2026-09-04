@@ -57,6 +57,7 @@ public class UserController implements UserControllerDocs {
     }
 
     @GetMapping(value = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<UserSummaryDTO> me(@AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(new UserSummaryDTO(
                 principal.getId(), principal.getName(), principal.getEmail(), principal.getRoles()
@@ -65,6 +66,7 @@ public class UserController implements UserControllerDocs {
 
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<List<UserSearchResultDTO>> search(@RequestParam("q") String q) {
         return ResponseEntity.ok(service.search(q));
     }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,23 @@ public interface ServiceOrderPhotoControllerDocs {
             }
     )
     ResponseEntity<ServiceOrderPhotoDTO> findById(@PathVariable("id") Long id);
+
+    @Operation(
+            summary = "Downloads a service order photo's binary content",
+            description = "Streams the raw image bytes for a given photo, with the original content type (image/jpeg, image/png or image/webp).",
+            tags = {"Service Order Photos"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = @Content(mediaType = "image/*")
+                    ),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<Resource> content(@PathVariable("id") Long id);
 
     @Operation(
             summary = "Uploads a new photo for a service order",

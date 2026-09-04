@@ -25,6 +25,25 @@ public interface ServiceOrderControllerDocs {
     })
     ResponseEntity<List<ServiceOrderDTO>> findAll();
 
+    @Operation(
+            summary = "Finds all service orders for a CEO",
+            description = "Finds all service orders linked to a given CEO, ordered by creation date (most recent first).",
+            tags = {"Service Orders"},
+            responses = {
+                    @ApiResponse(
+                            description = "Success",
+                            responseCode = "200",
+                            content = {
+                                    @Content(
+                                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                            array = @ArraySchema(schema = @Schema(implementation = ServiceOrderDTO.class)))}),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
+            }
+    )
+    ResponseEntity<List<ServiceOrderDTO>> findByCeo(@PathVariable Long ceoId);
+
     @Operation(summary = "Finds a service order", description = "Finds a service order by its Id.", tags = {"Service Orders"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
             @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),

@@ -32,6 +32,14 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
         return ResponseEntity.ok(service.findAll());
     }
 
+
+    @GetMapping(value = "/ceo/{ceoId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<List<ServiceOrderDTO>> findByCeo(@PathVariable("ceoId") Long ceoId) {
+        return ResponseEntity.ok(service.findByCeoId(ceoId));
+    }
+
+
     @GetMapping(value = "/id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ServiceOrderDTO> findById(@PathVariable("id") Long id) {
