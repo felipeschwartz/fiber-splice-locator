@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ServiceOrderPhotoMapper {
 
+    @Mapping(target = "id", source = "serviceOrderPhotoId")
     @Mapping(target = "serviceOrderId", source = "serviceOrder.serviceOrderId")
     ServiceOrderPhotoDTO toDTO(ServiceOrderPhoto entity);
 

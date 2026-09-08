@@ -65,7 +65,10 @@ public class SecurityConfigDev {
                                 "/error",
                                 "/api/test/v1"
                         ).permitAll()
-
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/reports/v1/**"
+                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/user/v1/me",
