@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -41,6 +42,12 @@ public class SecurityConfigDev {
         return http
                 .csrf(csrf -> csrf.disable())
 
+                // Sem isto, a Security nunca aplica o CORS configurado em
+                // WebConfig.addCorsMappings — o preflight OPTIONS cai como
+                // anônimo em anyRequest().authenticated(), leva 401 sem os
+                // headers de CORS, e o navegador só reporta "erro de rede".
+                .cors(Customizer.withDefaults())
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
@@ -56,6 +63,7 @@ public class SecurityConfigDev {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/v1/login",
                                 "/api/auth/v1/forgot-password",

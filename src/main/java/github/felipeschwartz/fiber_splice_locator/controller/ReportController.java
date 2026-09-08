@@ -6,6 +6,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.TechnicianServiceOrd
 import github.felipeschwartz.fiber_splice_locator.service.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,7 @@ public class ReportController implements ReportControllerDocs {
         this.service = service;
     }
 
-    @GetMapping(value = "/service-orders-by-technician", produces = "application/json")
+    @GetMapping(value = "/service-orders-by-technician", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<List<TechnicianServiceOrderCountDTO>> serviceOrdersByTechnician(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -35,7 +36,7 @@ public class ReportController implements ReportControllerDocs {
         return ResponseEntity.ok(service.serviceOrdersByTechnician(from, to));
     }
 
-    @GetMapping(value = "/ceo-recurrence", produces = "application/json")
+    @GetMapping(value = "/ceo-recurrence", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<List<CeoRecurrenceDTO>> ceoRecurrence(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
