@@ -3,10 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.controller;
 
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.docs.UserControllerDocs;
-import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserSummaryDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.*;
 import github.felipeschwartz.fiber_splice_locator.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -110,6 +107,16 @@ public class UserController implements UserControllerDocs {
                         updatedUser.getLinks().stream().collect(Collectors.toList())
                 )
         );
+    }
+
+    @PatchMapping(value = "/me/push-token", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<Void> updatePushToken(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody @Valid PushTokenDTO dto
+            ) {
+        service.updatePushToken(principal.getId(), dto.pushToken());
+        return ResponseEntity.noContent().build();
     }
 
 

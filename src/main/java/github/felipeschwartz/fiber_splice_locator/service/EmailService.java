@@ -17,11 +17,6 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-    // @Async: o envio via SMTP externo (ex.: Ethereal) pode levar vários
-    // segundos (DNS + handshake TLS + conversa SMTP) — se isso rodasse na
-    // mesma thread do request HTTP, o app podia estourar o timeout do
-    // axios (15s) esperando a resposta, mesmo com o e-mail sendo enviado
-    // com sucesso logo em seguida.
     @Async
     public void sendPasswordResetCode(String to, String code) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -29,6 +24,18 @@ public class EmailService {
         message.setTo(to);
         message.setSubject("Fiber Splice Locator - Código de redefinição de senha");
         message.setText("Use o código abaixo para redefinir sua senha. Ele expira em 15 minutos:\n\n" + code);
+        mailSender.send(message);
+    }
+
+    @Async
+    public void sendServiceOrderAssignedEmail(String to, Long serviceOrderId, String ceoBoxNumber) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(to);
+        message.setSubject("Fiber Splice Locator - Nova ordem de serviço atribuída a você");
+        message.setText("Você recebeu uma nova ordem de serviço.\n\n" +
+                "OS #" + serviceOrderId + " - CEO " + ceoBoxNumber + "\n\n" +
+                "Acesse o aplicativo para ver os detalhes e iniciar o atendimento.");
         mailSender.send(message);
     }
 }

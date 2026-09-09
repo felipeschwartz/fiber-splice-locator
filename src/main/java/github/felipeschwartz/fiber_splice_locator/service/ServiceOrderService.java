@@ -35,15 +35,19 @@ public class ServiceOrderService {
     private final ServiceOrderMapper serviceOrderMapper;
     private final CEORepository ceoRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final PushNotificationService pushNotificationService;
 
     public ServiceOrderService(ServiceOrderRepository serviceOrderRepository,
                                ServiceOrderMapper serviceOrderMapper,
                                CEORepository ceoRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository, EmailService emailService, PushNotificationService pushNotificationService) {
         this.serviceOrderRepository = serviceOrderRepository;
         this.serviceOrderMapper = serviceOrderMapper;
         this.ceoRepository = ceoRepository;
         this.userRepository = userRepository;
+        this.emailService = emailService;
+        this.pushNotificationService = pushNotificationService;
     }
 
     @Transactional(readOnly = true)
@@ -84,7 +88,9 @@ public class ServiceOrderService {
         User user = findUser(request);
         ServiceOrder entity = buildOpenServiceOrder(ceo, user);
         addInitialDescription(request, entity);
-        return saveAndMap(entity);
+        ServiceOrderDTO result = saveAndMap(entity);
+        notifyTechnicianAssigned(user, result.getServiceOrderId(), ceo.getBoxNumber());
+        return result;
     }
 
     @Transactional
@@ -104,8 +110,77 @@ public class ServiceOrderService {
         ServiceOrder entity = buildOpenServiceOrder(ceo, user);
         addInitialDescriptionRequired(request, entity);
         ceoRepository.save(ceo);
+        ServiceOrderDTO result = saveAndMap(entity);
+        notifyTechnicianAssigned(user, result.getServiceOrderId(), ceo.getBoxNumber());
+        return result;
+    }
+
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public ServiceOrderDTO update(Long id, ServiceOrderDTO dto) {
+        ServiceOrder entity = serviceOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+        serviceOrderMapper.updateEntityFromDTO(dto, entity);
+        ServiceOrderDTO result = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
+        addHateoasLinks(result);
+        return result;
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    public ServiceOrderDTO attend(Long id, ServiceOrderAttendanceDTO request) {
+        ServiceOrder entity = serviceOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+        if (request.getStatus() == null) throw new IllegalArgumentException("Status is required");
+        if (request.getStatusDescription() == null || request.getStatusDescription().isBlank()) {
+            throw new IllegalArgumentException("Status description is required");
+        }
+        entity.setStatus(request.getStatus());
+        entity.setUpdatedAt(LocalDateTime.now());
+        addDescription(request.getStatusDescription(), entity);
+        if (request.getGeoLocation() != null && !request.getGeoLocation().isBlank()
+                && entity.getCeo() != null && entity.getCeo().getAddress() != null) {
+            entity.getCeo().getAddress().setGeoLocation(request.getGeoLocation().trim());
+        }
         return saveAndMap(entity);
     }
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    public ServiceOrderDTO assignTechnician(Long serviceOrderId, Long userId) {
+        ServiceOrder entity = serviceOrderRepository.findById(serviceOrderId)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + serviceOrderId));
+        User technician = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Technician not found: " + userId));
+        if (!technician.getRoles().contains("FIELD_TECHNICIAN")) {
+            throw new IllegalArgumentException("User is not a field technician: " + userId);
+        }
+        entity.setUser(technician);
+        entity.setUpdatedAt(LocalDateTime.now());
+        ServiceOrderDTO result = saveAndMap(entity);
+        notifyTechnicianAssigned(technician, result.getServiceOrderId(), entity.getCeo().getBoxNumber());
+        return result;
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN')")
+    public void delete(Long id) {
+        if (!serviceOrderRepository.existsById(id)) {
+            throw new EntityNotFoundException("Service order not found: " + id);
+        }
+        serviceOrderRepository.deleteById(id);
+    }
+
+    private void addHateoasLinks(ServiceOrderDTO dto) {
+        dto.add(linkTo(methodOn(ServiceOrderController.class).findById(dto.getServiceOrderId())).withSelfRel().withType("GET"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).findAll()).withRel("findAll").withType("GET"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).create(dto)).withRel("create").withType("POST"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).open(dto)).withRel("open").withType("POST"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).update(dto.getServiceOrderId(), dto)).withRel("update").withType("PUT"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).delete(dto.getServiceOrderId())).withRel("delete").withType("DELETE"));
+    }
+
 
     private CEO findCeo(ServiceOrderDTO request) {
         if (request == null || request.getCeo() == null || request.getCeo().getId() == null) {
@@ -173,66 +248,10 @@ public class ServiceOrderService {
         return result;
     }
 
-    @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderDTO update(Long id, ServiceOrderDTO dto) {
-        ServiceOrder entity = serviceOrderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
-        serviceOrderMapper.updateEntityFromDTO(dto, entity);
-        ServiceOrderDTO result = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
-        addHateoasLinks(result);
-        return result;
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderDTO attend(Long id, ServiceOrderAttendanceDTO request) {
-        ServiceOrder entity = serviceOrderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
-        if (request.getStatus() == null) throw new IllegalArgumentException("Status is required");
-        if (request.getStatusDescription() == null || request.getStatusDescription().isBlank()) {
-            throw new IllegalArgumentException("Status description is required");
-        }
-        entity.setStatus(request.getStatus());
-        entity.setUpdatedAt(LocalDateTime.now());
-        addDescription(request.getStatusDescription(), entity);
-        if (request.getGeoLocation() != null && !request.getGeoLocation().isBlank()
-                && entity.getCeo() != null && entity.getCeo().getAddress() != null) {
-            entity.getCeo().getAddress().setGeoLocation(request.getGeoLocation().trim());
-        }
-        return saveAndMap(entity);
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
-    public ServiceOrderDTO assignTechnician(Long serviceOrderId, Long userId) {
-        ServiceOrder entity = serviceOrderRepository.findById(serviceOrderId)
-                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + serviceOrderId));
-        User technician = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Technician not found: " + userId));
-        if (!technician.getRoles().contains("FIELD_TECHNICIAN")) {
-            throw new IllegalArgumentException("User is not a field technician: " + userId);
-        }
-        entity.setUser(technician);
-        entity.setUpdatedAt(LocalDateTime.now());
-        return saveAndMap(entity);
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
-    public void delete(Long id) {
-        if (!serviceOrderRepository.existsById(id)) {
-            throw new EntityNotFoundException("Service order not found: " + id);
-        }
-        serviceOrderRepository.deleteById(id);
-    }
-
-    private void addHateoasLinks(ServiceOrderDTO dto) {
-        dto.add(linkTo(methodOn(ServiceOrderController.class).findById(dto.getServiceOrderId())).withSelfRel().withType("GET"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).findAll()).withRel("findAll").withType("GET"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).create(dto)).withRel("create").withType("POST"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).open(dto)).withRel("open").withType("POST"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).update(dto.getServiceOrderId(), dto)).withRel("update").withType("PUT"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).delete(dto.getServiceOrderId())).withRel("delete").withType("DELETE"));
+    private void notifyTechnicianAssigned(User technician, Long serviceOrderId, String ceoBoxNumber) {
+        emailService.sendServiceOrderAssignedEmail(technician.getEmail(), serviceOrderId, ceoBoxNumber);
+        pushNotificationService.sendPush(technician.getPushToken(), "Nova ordem de serviço",
+                "Você recebeu a OS #" + serviceOrderId + " (CEO " + ceoBoxNumber + ")"
+        );
     }
 }

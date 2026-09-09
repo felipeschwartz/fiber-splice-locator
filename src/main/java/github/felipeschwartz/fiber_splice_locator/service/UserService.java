@@ -114,6 +114,17 @@ public class UserService {
         return updatedUserDTO;
     }
 
+
+    @Transactional
+    public void updatePushToken(Long userId, String pushToken) {
+        logger.info("Updating push token for User with ID: {}", userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("User", userId));
+        user.setPushToken(pushToken);
+        userRepository.save(user);
+    }
+
+
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public UserDTO disableUser(Long id, CustomUserDetails principal) {

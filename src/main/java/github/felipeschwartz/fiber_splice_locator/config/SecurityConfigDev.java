@@ -97,7 +97,10 @@ public class SecurityConfigDev {
                                 HttpMethod.POST,
                                 "/api/user/v1"
                         ).hasAnyRole("GOD_ADMIN", "ADMIN")
-
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/user/v1/me/push-token"
+                        ).authenticated()
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/user/v1/**"

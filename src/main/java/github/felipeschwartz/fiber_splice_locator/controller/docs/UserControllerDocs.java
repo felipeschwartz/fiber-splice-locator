@@ -1,10 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
-import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserSummaryDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -146,6 +143,23 @@ public interface UserControllerDocs {
             @PathVariable Long id,
             @RequestBody @Valid UserDTO userDTO
     );
+
+    @Operation(
+            summary = "Updates the authenticated user's push notification token",
+            description = "Stores the Expo push token for the current device, used to send push notifications (e.g., when a new service order is assigned).",
+            tags = {"User"},
+            requestBody = @RequestBody(
+                    description = "Expo push token",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PushTokenDTO.class))
+            ),
+            responses = {
+                    @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content)
+            }
+    )
+    ResponseEntity<Void> updatePushToken(CustomUserDetails principal, @Valid PushTokenDTO dto);
 
     @Operation(
             summary = "Disables a user",

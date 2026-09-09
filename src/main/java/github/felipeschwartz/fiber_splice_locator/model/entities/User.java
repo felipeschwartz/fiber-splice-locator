@@ -33,6 +33,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean active;
 
+    @Column
+    private String pushToken;
+
     public User() {
     }
 
@@ -90,6 +93,14 @@ public class User implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getPushToken() {
+        return pushToken;
+    }
+
+    public void setPushToken(String pushToken) {
+        this.pushToken = pushToken;
     }
 
     @Override
