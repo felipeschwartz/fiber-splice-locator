@@ -107,7 +107,7 @@ public class DevDatabaseSeeder implements CommandLineRunner {
         tech4.setName("Ana Costa");
         tech4.setEmail("ana.costa@fiberlocator.com");
         tech4.setPassword(passwordEncoder.encode("tech123"));
-        tech4.setRoles(Set.of("ADMIN"));
+        tech4.setRoles(Set.of("FIELD_TECHNICIAN"));
         tech4.setActive(true);
 
         return userRepository.saveAll(List.of(god, admin, tech1, tech2, tech3, tech4));

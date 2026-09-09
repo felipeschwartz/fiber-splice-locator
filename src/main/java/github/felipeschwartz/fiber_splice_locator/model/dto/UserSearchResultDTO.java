@@ -1,3 +1,5 @@
 package github.felipeschwartz.fiber_splice_locator.model.dto;
 
-public record UserSearchResultDTO(Long id, String name, String email) {}
+import java.util.Set;
+
+public record UserSearchResultDTO(Long id, String name, String email, Set<String> roles, Boolean active) {}

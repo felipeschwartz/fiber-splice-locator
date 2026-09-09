@@ -78,8 +78,11 @@ public class UserController implements UserControllerDocs {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<EntityModel<UserDTO>> create(@RequestBody @Valid UserDTO userDTO) {
-        UserDTO createdUser = service.create(userDTO);
+    public ResponseEntity<EntityModel<UserDTO>> create(
+            @RequestBody @Valid UserDTO userDTO,
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        UserDTO createdUser = service.create(userDTO, principal);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/id/{id}")
                 .buildAndExpand(createdUser.getId())
@@ -112,13 +115,15 @@ public class UserController implements UserControllerDocs {
 
     @PatchMapping(value = "/id/{id}/disable", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public ResponseEntity<Void> disableUser(@PathVariable("id") Long id) {
-        service.disableUser(id);
+    public ResponseEntity<Void> disableUser(
+            @PathVariable("id") Long id,
+            @AuthenticationPrincipal CustomUserDetails principal
+    ) {
+        service.disableUser(id, principal);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping(value = "/me/password", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Override
     public ResponseEntity<Void> changeOwnPassword(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestBody @Valid ChangePasswordDTO dto

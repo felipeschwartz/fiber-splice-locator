@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
+import github.felipeschwartz.fiber_splice_locator.model.dto.AssignTechnicianRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,6 +80,21 @@ public interface ServiceOrderControllerDocs {
             @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
     })
     ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderAttendanceDTO request);
+
+    @Operation(
+            summary = "Assigns a service order to a field technician",
+            description = "Changes the technician (user) responsible for a service order. The target user must have the FIELD_TECHNICIAN role.",
+            tags = {"Service Orders"},
+            requestBody = @RequestBody(description = "Id of the technician to assign", required = true,
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AssignTechnicianRequestDTO.class))),
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
+            }
+    )
+    ResponseEntity<ServiceOrderDTO> assignTechnician(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid AssignTechnicianRequestDTO request);
 
     @Operation(summary = "Deletes a service order", description = "Deletes a service order identified by its ID.", tags = {"Service Orders"}, responses = {
             @ApiResponse(description = "No Content", responseCode = "204", content = @Content),

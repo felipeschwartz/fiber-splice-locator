@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidResetTokenException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.UserRoleOperationNotAllowedException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -92,4 +93,29 @@ public class ControllerExceptionHandler {
         );
         return ResponseEntity.status(status).body(error);
     }
+
+    @ExceptionHandler(UserRoleOperationNotAllowedException.class)
+    public ResponseEntity<StandardError> userRoleOperationNotAllowed(
+            UserRoleOperationNotAllowedException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        StandardError error = new StandardError(
+                System.currentTimeMillis(), status.value(), "Operation Not Allowed", exception.getMessage(), request.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<StandardError> illegalArgument(
+            IllegalArgumentException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        StandardError error = new StandardError(
+                System.currentTimeMillis(), status.value(), "Bad Request", exception.getMessage(), request.getRequestURI()
+        );
+        return ResponseEntity.status(status).body(error);
+    }
+
 }

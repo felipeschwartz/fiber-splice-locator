@@ -89,7 +89,10 @@ public class SecurityConfigDev {
                         .requestMatchers(HttpMethod.GET,
                                 "/api/user/v1/**")
                         .hasAnyRole("GOD_ADMIN", "ADMIN")
-
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/service_orders/v1/*/assign-technician"
+                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/user/v1"

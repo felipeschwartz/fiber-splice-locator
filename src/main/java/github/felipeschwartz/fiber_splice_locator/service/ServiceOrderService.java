@@ -204,6 +204,21 @@ public class ServiceOrderService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    public ServiceOrderDTO assignTechnician(Long serviceOrderId, Long userId) {
+        ServiceOrder entity = serviceOrderRepository.findById(serviceOrderId)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + serviceOrderId));
+        User technician = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Technician not found: " + userId));
+        if (!technician.getRoles().contains("FIELD_TECHNICIAN")) {
+            throw new IllegalArgumentException("User is not a field technician: " + userId);
+        }
+        entity.setUser(technician);
+        entity.setUpdatedAt(LocalDateTime.now());
+        return saveAndMap(entity);
+    }
+
+    @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN')")
     public void delete(Long id) {
         if (!serviceOrderRepository.existsById(id)) {

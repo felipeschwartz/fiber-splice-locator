@@ -1,6 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
 import github.felipeschwartz.fiber_splice_locator.controller.docs.ServiceOrderControllerDocs;
+import github.felipeschwartz.fiber_splice_locator.model.dto.AssignTechnicianRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import github.felipeschwartz.fiber_splice_locator.service.ServiceOrderService;
@@ -81,6 +82,15 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
     public ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id,
                                                   @RequestBody @Valid ServiceOrderAttendanceDTO request) {
         return ResponseEntity.ok(service.attend(id, request));
+    }
+
+    @PatchMapping(value = "/{id}/assign-technician", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<ServiceOrderDTO> assignTechnician(
+            @PathVariable("id") Long id,
+            @RequestBody @Valid AssignTechnicianRequestDTO request
+    ) {
+        return ResponseEntity.ok(service.assignTechnician(id, request.userId()));
     }
 
     @DeleteMapping("/{id}")

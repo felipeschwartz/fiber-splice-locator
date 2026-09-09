@@ -1,6 +1,7 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
-
+import java.util.Set;
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.UserController;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
@@ -10,6 +11,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.UserRoleOperationNotAllowedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -68,7 +70,7 @@ public class UserService {
                 ? userRepository.findById(Long.parseLong(value)).map(List::of).orElseGet(List::of)
                 : userRepository.findByNameContainingIgnoreCase(value);
         return results.stream()
-                .map(u -> new UserSearchResultDTO(u.getId(), u.getName(), u.getEmail()))
+                .map(u -> new UserSearchResultDTO(u.getId(), u.getName(), u.getEmail(), u.getRoles(), u.getActive()))
                 .collect(Collectors.toList());
     }
 
@@ -76,15 +78,25 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
-    public UserDTO create(UserDTO requestDTO) {
+    public UserDTO create(UserDTO requestDTO, CustomUserDetails principal) {
         logger.info("Creating a User: {}", requestDTO.getName());
+        if (requestDTO.getPassword() == null || requestDTO.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be null or empty");
+        }
         User user = userMapper.toEntity(requestDTO);
         user.setPassword(passwordEncoder.encode(requestDTO.getPassword()));
-        user.setRoles(requestDTO.getRoles());
+        user.setRoles(resolveRolesForCreation(requestDTO.getRoles(), principal));
         User savedUser = userRepository.save(user);
         UserDTO createdUserDTO = userMapper.toDTO(savedUser);
         addHateoasLinks(createdUserDTO);
         return createdUserDTO;
+    }
+
+    private Set<String> resolveRolesForCreation(Set<String> requestedRoles, CustomUserDetails principal) {
+        if (principal.getRoles().contains("GOD_ADMIN")) {
+            return requestedRoles;
+        }
+        return Set.of("FIELD_TECHNICIAN");
     }
 
 
@@ -104,11 +116,13 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
-    public UserDTO disableUser(Long id) {
+    public UserDTO disableUser(Long id, CustomUserDetails principal) {
         logger.info("Disabling User with ID: {}", id);
-        if (!userRepository.existsById(id)) {
-            throw new ObjectNotFoundException("User not found with ID: " + id);
-        }
+        User target = userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User not found with ID: " + id));
+
+        ensureCanDisable(principal, target);
+
         userRepository.disableUserById(id);
         var entity = userRepository.findById(id).get();
         var updatedUserDTO = userMapper.toDTO(entity);
@@ -143,13 +157,25 @@ public class UserService {
     }
 
 
+    private void ensureCanDisable(CustomUserDetails principal, User target) {
+        if (principal.getId().equals(target.getId())) {
+            throw new UserRoleOperationNotAllowedException("You cannot disable your own account");
+        }
+
+        boolean targetIsPrivileged = target.getRoles().contains("GOD_ADMIN") || target.getRoles().contains("ADMIN");
+        boolean actorIsGodAdmin = principal.getRoles().contains("GOD_ADMIN");
+
+        if (targetIsPrivileged && !actorIsGodAdmin) {
+            throw new UserRoleOperationNotAllowedException("Only a GOD_ADMIN can disable an ADMIN or GOD_ADMIN account");
+        }
+    }
 
     private void addHateoasLinks(UserDTO dto) {
         dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).findAll()).withRel("findAllUsers").withType("GET"));
-        dto.add(linkTo(methodOn(UserController.class).create(null)).withRel("createUser").withType("POST"));
+        dto.add(linkTo(methodOn(UserController.class).create(dto, null)).withRel("createUser").withType("POST"));
         dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), dto)).withRel("updateUser").withType("PUT"));
-        dto.add(linkTo(methodOn(UserController.class).disableUser(dto.getId())).withRel("disableUser").withType("PATCH"));
+        dto.add(linkTo(methodOn(UserController.class).disableUser(dto.getId(), null)).withRel("disableUser").withType("PATCH"));
         dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("deleteUser").withType("DELETE"));
     }
 }

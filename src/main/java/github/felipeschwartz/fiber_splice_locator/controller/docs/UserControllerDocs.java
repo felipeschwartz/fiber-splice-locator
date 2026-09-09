@@ -80,7 +80,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Searches users",
-            description = "Searches users by ID (if the query is numeric) or by name (case-insensitive, partial match). Returns only id, name and email by design.",
+            description = "Searches users by ID (if the query is numeric) or by name (case-insensitive, partial match).",
             tags = {"User"},
             responses = {
                     @ApiResponse(
@@ -98,7 +98,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Creates a new user",
-            description = "Creates a new user with the provided details.",
+            description = "Creates a new user with the provided details. Only a GOD_ADMIN can freely choose the roles; when the caller is an ADMIN, the created user's roles are forced to FIELD_TECHNICIAN regardless of what is sent.",
             tags = {"User"},
             requestBody = @RequestBody(
                     description = "User details for creation",
@@ -118,7 +118,7 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<EntityModel<UserDTO>> create(@RequestBody @Valid UserDTO userDTO);
+    ResponseEntity<EntityModel<UserDTO>> create(@RequestBody @Valid UserDTO userDTO, CustomUserDetails principal);
 
     @Operation(
             summary = "Updates an existing user",
@@ -147,10 +147,9 @@ public interface UserControllerDocs {
             @RequestBody @Valid UserDTO userDTO
     );
 
-
     @Operation(
             summary = "Disables a user",
-            description = "Disables a user identified by their ID.",
+            description = "Disables a user identified by their ID. A user can never disable their own account. An ADMIN can only disable FIELD_TECHNICIAN accounts; disabling an ADMIN or GOD_ADMIN account requires a GOD_ADMIN caller.",
             tags = {"User"},
             responses = {
                     @ApiResponse(
@@ -161,12 +160,12 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
-    ResponseEntity<Void> disableUser(@PathVariable Long id);
-
+    ResponseEntity<Void> disableUser(@PathVariable Long id, CustomUserDetails principal);
 
     @Operation(
             summary = "Changes the authenticated user's own password",
@@ -185,7 +184,6 @@ public interface UserControllerDocs {
             }
     )
     ResponseEntity<Void> changeOwnPassword(CustomUserDetails principal, @Valid ChangePasswordDTO dto);
-
 
     @Operation(
             summary = "Deletes a user",
