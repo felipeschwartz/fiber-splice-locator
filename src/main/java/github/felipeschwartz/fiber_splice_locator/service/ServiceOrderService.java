@@ -9,6 +9,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderStatusDescription;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
@@ -142,6 +143,12 @@ public class ServiceOrderService {
         if (request.getGeoLocation() != null && !request.getGeoLocation().isBlank()
                 && entity.getCeo() != null && entity.getCeo().getAddress() != null) {
             entity.getCeo().getAddress().setGeoLocation(request.getGeoLocation().trim());
+        }
+        if (request.getStatus() == ServiceOrderStatus.COMPLETED
+                && entity.getCeo() != null
+                && entity.getCeo().getStatus() != CEOStatus.CANCELLED) {
+            entity.getCeo().changeStatus(CEOStatus.STANDARDIZED);
+            ceoRepository.save(entity.getCeo());
         }
         return saveAndMap(entity);
     }
