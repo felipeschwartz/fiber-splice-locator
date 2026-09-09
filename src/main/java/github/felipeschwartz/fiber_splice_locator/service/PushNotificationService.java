@@ -13,7 +13,7 @@ import java.util.Map;
 public class PushNotificationService {
     private static final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
 
-    private final RestClient restClient = RestClient.create("http://exp.host/--/api/v2/push/send");
+    private final RestClient restClient = RestClient.create("https://exp.host/--/api/v2/push/send");
 
     @Async
     public void sendPush(String pushToken, String title, String body) {

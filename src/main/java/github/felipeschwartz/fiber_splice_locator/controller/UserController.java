@@ -131,6 +131,7 @@ public class UserController implements UserControllerDocs {
     }
 
     @PatchMapping(value = "/me/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public ResponseEntity<Void> changeOwnPassword(
             @AuthenticationPrincipal CustomUserDetails principal,
             @RequestBody @Valid ChangePasswordDTO dto
