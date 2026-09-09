@@ -73,7 +73,7 @@ class UserControllerIT {
 
     @Test
     void create_ReturnsCreatedAndLocationHeader() throws Exception {
-        when(userService.create(any(UserDTO.class))).thenReturn(userDTO);
+        when(userService.create(any(UserDTO.class), any())).thenReturn(userDTO);
 
         mockMvc.perform(post("/api/user/v1")
                         .with(user("admin").roles("ADMIN"))

@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
@@ -18,6 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -34,6 +36,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private CustomUserDetails principal;
 
     @InjectMocks
     private UserService userService;
@@ -86,8 +91,9 @@ class UserServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDTO(user)).thenReturn(userDTO);
+        when(principal.getRoles()).thenReturn(Set.of("GOD_ADMIN"));
 
-        UserDTO result = userService.create(userDTO);
+        UserDTO result = userService.create(userDTO, principal);
 
         assertNotNull(result);
         verify(userRepository, times(1)).save(any(User.class));
