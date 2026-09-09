@@ -8,6 +8,13 @@ app:
 spring:
   main:
     allow-circular-references: true
+  servlet:
+    multipart:
+      # Sem isso, o Spring Boot usa o padrão de 1MB por arquivo e barra fotos
+      # tiradas direto da câmera antes mesmo da validação de 10MB do
+      # ServiceOrderPhotoService (que já permite até esse tamanho).
+      max-file-size: 15MB
+      max-request-size: 15MB
   application:
     name: fiber_splice_locator
   datasource:
