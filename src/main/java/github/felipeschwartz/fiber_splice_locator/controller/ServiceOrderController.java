@@ -86,6 +86,12 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
         return ResponseEntity.ok(service.attend(id, request));
     }
 
+    @PatchMapping(value = "/{id}/cancel", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
+    public ResponseEntity<ServiceOrderDTO> cancel(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(service.cancel(id));
+    }
+
     @PatchMapping(value = "/{id}/assign-technician", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ServiceOrderDTO> assignTechnician(

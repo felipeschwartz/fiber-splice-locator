@@ -112,6 +112,12 @@ public class ServiceOrderService {
         }
 
         CEO ceo = findCeo(request);
+        boolean hasNonTerminalOrder = serviceOrderRepository.findByCeo_IdOrderByCreatedAtDesc(ceo.getId()).stream()
+                .anyMatch(existing -> existing.getStatus() == ServiceOrderStatus.OPEN
+                        || existing.getStatus() == ServiceOrderStatus.IN_PROGRESS);
+        if (hasNonTerminalOrder) {
+            throw new IllegalArgumentException("Já existe uma ordem de serviço em aberto ou em andamento para esta CEO.");
+        }
         ceo.changeStatus(request.getCeoStatus());
         User user = findUser(request);
         ServiceOrder entity = buildOpenServiceOrder(ceo, user);
@@ -156,6 +162,28 @@ public class ServiceOrderService {
             entity.getCeo().changeStatus(CEOStatus.STANDARDIZED);
             ceoRepository.save(entity.getCeo());
         }
+        return saveAndMap(entity);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('GOD_ADMIN')")
+    public ServiceOrderDTO cancel(Long id) {
+        ServiceOrder entity = serviceOrderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+
+        if (entity.getStatus() == ServiceOrderStatus.CANCELLED || entity.getStatus() == ServiceOrderStatus.COMPLETED) {
+            throw new IllegalArgumentException("Esta ordem de serviço já está finalizada.");
+        }
+
+        entity.setStatus(ServiceOrderStatus.CANCELLED);
+        entity.setUpdatedAt(LocalDateTime.now());
+        addDescription("Ordem de serviço cancelada pelo administrador.", entity);
+
+        if (entity.getCeo() != null) {
+            entity.getCeo().changeStatus(CEOStatus.STANDARDIZED);
+            ceoRepository.save(entity.getCeo());
+        }
+
         return saveAndMap(entity);
     }
 

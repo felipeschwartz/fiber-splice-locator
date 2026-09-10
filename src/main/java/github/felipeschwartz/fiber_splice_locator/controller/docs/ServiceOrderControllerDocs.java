@@ -60,7 +60,7 @@ public interface ServiceOrderControllerDocs {
     })
     ResponseEntity<EntityModel<ServiceOrderDTO>> create(@org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO request);
 
-    @Operation(summary = "Opens a service order and changes CEO status", description = "Atomically changes the CEO status, creates a service order with status OPEN and stores the initial description. Only GOD_ADMIN or ADMIN callers can open a service order.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "CEO ID, CEO status, user ID and initial problem description", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderDTO.class))), responses = {
+    @Operation(summary = "Opens a service order and changes CEO status", description = "Atomically changes the CEO status, creates a service order with status OPEN and stores the initial description. Only GOD_ADMIN or ADMIN callers can open a service order. Rejected if the CEO already has a service order with status OPEN or IN_PROGRESS.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "CEO ID, CEO status, user ID and initial problem description", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderDTO.class))), responses = {
             @ApiResponse(description = "Created", responseCode = "201", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
             @ApiResponse(description = "CEO or user not found", responseCode = "404", content = @Content),
@@ -82,6 +82,20 @@ public interface ServiceOrderControllerDocs {
             @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
     })
     ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderAttendanceDTO request);
+
+    @Operation(
+            summary = "Cancels a service order",
+            description = "Cancels a service order and resets its CEO's status back to STANDARDIZED. Only a GOD_ADMIN can cancel a service order, and only if it isn't already COMPLETED or CANCELLED.",
+            tags = {"Service Orders"},
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
+                    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
+                    @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
+            }
+    )
+    ResponseEntity<ServiceOrderDTO> cancel(@PathVariable("id") Long id);
 
     @Operation(
             summary = "Assigns a service order to a field technician",
