@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.docs.ServiceOrderControllerDocs;
 import github.felipeschwartz.fiber_splice_locator.model.dto.AssignTechnicianRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -29,8 +31,8 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public ResponseEntity<List<ServiceOrderDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<ServiceOrderDTO>> findAll(@AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(service.findAll(principal));
     }
 
 

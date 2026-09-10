@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.controller.ServiceOrderController;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
@@ -53,8 +54,13 @@ public class ServiceOrderService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public List<ServiceOrderDTO> findAll() {
-        List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findAll().stream()
+    public List<ServiceOrderDTO> findAll(CustomUserDetails principal) {
+        boolean isPrivileged = principal.getRoles().contains("GOD_ADMIN") || principal.getRoles().contains("ADMIN");
+        List<ServiceOrder> entities = isPrivileged
+                ? serviceOrderRepository.findAll()
+                : serviceOrderRepository.findByUser_IdOrderByCreatedAtDesc(principal.getId());
+
+        List<ServiceOrderDTO> serviceOrders = entities.stream()
                 .map(serviceOrderMapper::toDTO)
                 .collect(Collectors.toList());
         serviceOrders.forEach(this::addHateoasLinks);
@@ -95,7 +101,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
     public ServiceOrderDTO open(ServiceOrderDTO request) {
         logger.info("Opening a Service Order and changing CEO status");
         if (request == null || request.getCeo() == null || request.getCeo().getId() == null) {
@@ -181,7 +187,7 @@ public class ServiceOrderService {
 
     private void addHateoasLinks(ServiceOrderDTO dto) {
         dto.add(linkTo(methodOn(ServiceOrderController.class).findById(dto.getServiceOrderId())).withSelfRel().withType("GET"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).findAll()).withRel("findAll").withType("GET"));
+        dto.add(linkTo(methodOn(ServiceOrderController.class).findAll(null)).withRel("findAll").withType("GET"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).create(dto)).withRel("create").withType("POST"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).open(dto)).withRel("open").withType("POST"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).update(dto.getServiceOrderId(), dto)).withRel("update").withType("PUT"));

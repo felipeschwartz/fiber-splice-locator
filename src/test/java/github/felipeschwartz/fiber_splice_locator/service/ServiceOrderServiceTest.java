@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
@@ -46,6 +47,9 @@ class ServiceOrderServiceTest  {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private CustomUserDetails principal;
+
     @InjectMocks
     private ServiceOrderService serviceOrderService;
 
@@ -68,10 +72,11 @@ class ServiceOrderServiceTest  {
 
     @Test
     void findAll_ReturnsListOfServiceOrderDTO() {
+        when(principal.getRoles()).thenReturn(java.util.Set.of("ADMIN"));
         when(serviceOrderRepository.findAll()).thenReturn(List.of(serviceOrder));
         when(serviceOrderMapper.toDTO(serviceOrder)).thenReturn(serviceOrderDTO);
 
-        List<ServiceOrderDTO> result = serviceOrderService.findAll();
+        List<ServiceOrderDTO> result = serviceOrderService.findAll(principal);
 
         assertNotNull(result);
         assertEquals(1, result.size());

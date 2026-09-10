@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.controller.docs;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.model.dto.AssignTechnicianRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
@@ -19,12 +20,12 @@ import java.util.List;
 
 public interface ServiceOrderControllerDocs {
 
-    @Operation(summary = "Finds all Service Orders", description = "Finds all service orders on database.", tags = {"Service Orders"}, responses = {
+    @Operation(summary = "Finds all Service Orders", description = "Finds all service orders on database. A GOD_ADMIN or ADMIN caller sees every order; a FIELD_TECHNICIAN caller only sees orders assigned to them.", tags = {"Service Orders"}, responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = ServiceOrderDTO.class)))),
             @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
             @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
     })
-    ResponseEntity<List<ServiceOrderDTO>> findAll();
+    ResponseEntity<List<ServiceOrderDTO>> findAll(CustomUserDetails principal);
 
     @Operation(
             summary = "Finds all service orders for a CEO",
@@ -59,11 +60,12 @@ public interface ServiceOrderControllerDocs {
     })
     ResponseEntity<EntityModel<ServiceOrderDTO>> create(@org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO request);
 
-    @Operation(summary = "Opens a service order and changes CEO status", description = "Atomically changes the CEO status, creates a service order with status OPEN and stores the initial description.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "CEO ID, CEO status, user ID and initial problem description", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderDTO.class))), responses = {
+    @Operation(summary = "Opens a service order and changes CEO status", description = "Atomically changes the CEO status, creates a service order with status OPEN and stores the initial description. Only GOD_ADMIN or ADMIN callers can open a service order.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "CEO ID, CEO status, user ID and initial problem description", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderDTO.class))), responses = {
             @ApiResponse(description = "Created", responseCode = "201", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
             @ApiResponse(description = "CEO or user not found", responseCode = "404", content = @Content),
-            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content)
+            @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content)
     })
     ResponseEntity<EntityModel<ServiceOrderDTO>> open(@org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO request);
 

@@ -58,7 +58,7 @@ class ServiceOrderControllerIT {
 
     @Test
     void findAll_ReturnsOk() throws Exception {
-        when(serviceOrderService.findAll()).thenReturn(List.of(serviceOrderDTO));
+        when(serviceOrderService.findAll(any())).thenReturn(List.of(serviceOrderDTO));
 
         mockMvc.perform(get("/api/service_orders/v1")
                         .with(user("technician").roles("FIELD_TECHNICIAN")))

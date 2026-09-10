@@ -13,6 +13,8 @@ import java.util.List;
 public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long> {
     List<ServiceOrder> findByCeo_IdOrderByCreatedAtDesc(Long ceoId);
 
+    List<ServiceOrder> findByUser_IdOrderByCreatedAtDesc(Long userId);
+
     @Query("""
         SELECT new github.felipeschwartz.fiber_splice_locator.model.dto.TechnicianServiceOrderCountDTO(
                 u.id, u.name, COUNT(so)
