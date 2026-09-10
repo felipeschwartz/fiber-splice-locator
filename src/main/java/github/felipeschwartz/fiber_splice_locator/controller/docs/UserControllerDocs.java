@@ -119,7 +119,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Updates an existing user",
-            description = "Updates an existing user identified by their ID.",
+            description = "Updates an existing user identified by their ID. Editing a GOD_ADMIN account requires a GOD_ADMIN caller.",
             tags = {"User"},
             requestBody = @RequestBody(
                     description = "Updated user details",
@@ -135,13 +135,15 @@ public interface UserControllerDocs {
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
                     @ApiResponse(description = "Not found", responseCode = "404", content = @Content),
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
     ResponseEntity<EntityModel<UserDTO>> update(
             @PathVariable Long id,
-            @RequestBody @Valid UserDTO userDTO
+            @RequestBody @Valid UserDTO userDTO,
+            CustomUserDetails principal
     );
 
     @Operation(

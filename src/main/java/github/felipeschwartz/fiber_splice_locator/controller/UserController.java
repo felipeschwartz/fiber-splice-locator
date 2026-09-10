@@ -95,11 +95,12 @@ public class UserController implements UserControllerDocs {
     @Override
     public ResponseEntity<EntityModel<UserDTO>> update(
             @PathVariable Long id,
-            @RequestBody @Valid UserDTO userDTO
+            @RequestBody @Valid UserDTO userDTO,
+            @AuthenticationPrincipal CustomUserDetails principal
     ) {
         userDTO.setId(id);
 
-        UserDTO updatedUser = service.update(userDTO);
+        UserDTO updatedUser = service.update(userDTO, principal);
 
         return ResponseEntity.ok(
                 EntityModel.of(

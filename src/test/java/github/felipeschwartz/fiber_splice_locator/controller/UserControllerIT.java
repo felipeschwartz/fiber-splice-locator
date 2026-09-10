@@ -103,7 +103,7 @@ class UserControllerIT {
 
     @Test
     void update_ReturnsOk() throws Exception {
-        when(userService.update(any(UserDTO.class))).thenReturn(userDTO);
+        when(userService.update(any(UserDTO.class), any())).thenReturn(userDTO);
 
         mockMvc.perform(put("/api/user/v1/id/{id}", 1L)
                         .with(user("admin").roles("ADMIN"))

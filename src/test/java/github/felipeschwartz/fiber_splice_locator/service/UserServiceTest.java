@@ -103,11 +103,12 @@ class UserServiceTest {
     @Test
     void update_WhenUserExists_ReturnsUpdatedUserDTO() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(principal.getRoles()).thenReturn(Set.of("ADMIN"));
         doNothing().when(userMapper).updateEntityFromDTO(userDTO, user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDTO(user)).thenReturn(userDTO);
 
-        UserDTO result = userService.update(userDTO);
+        UserDTO result = userService.update(userDTO, principal);
 
         assertNotNull(result);
         verify(userRepository, times(1)).save(user);
@@ -118,7 +119,7 @@ class UserServiceTest {
         UserDTO nonExisting = new UserDTO(99L, "Ghost", "ghost@example.com", "123456", true);
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ObjectNotFoundException.class, () -> userService.update(nonExisting));
+        assertThrows(ObjectNotFoundException.class, () -> userService.update(nonExisting, principal));
     }
 
     @Test

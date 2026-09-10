@@ -11,6 +11,9 @@ RUN ./mvnw clean install -DskipTests
 # Stage de execução
 FROM eclipse-temurin:25.0.3_9-jre-noble
 WORKDIR /app
+# Sem isso, o Render roda o container em UTC e LocalDateTime.now() (usado em
+# toda a aplicação) fica 3h à frente do horário real de Brasília.
+ENV TZ=America/Sao_Paulo
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

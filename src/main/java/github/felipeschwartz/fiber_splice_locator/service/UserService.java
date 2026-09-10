@@ -103,11 +103,14 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
-    public UserDTO update(UserDTO updatedDTO) {
+    public UserDTO update(UserDTO updatedDTO, CustomUserDetails principal) {
         logger.info("Updating User with ID: {}", updatedDTO.getId());
 
         User existingUser = userRepository.findById(updatedDTO.getId())
                 .orElseThrow(() -> new ObjectNotFoundException("User with ID: " + updatedDTO.getId()));
+
+        ensureCanEdit(principal, existingUser);
+
         userMapper.updateEntityFromDTO(updatedDTO, existingUser);
         UserDTO updatedUserDTO = userMapper.toDTO(userRepository.save(existingUser));
         addHateoasLinks(updatedUserDTO);
@@ -181,11 +184,20 @@ public class UserService {
         }
     }
 
+    private void ensureCanEdit(CustomUserDetails principal, User target) {
+        boolean targetIsGodAdmin = target.getRoles().contains("GOD_ADMIN");
+        boolean actorIsGodAdmin = principal.getRoles().contains("GOD_ADMIN");
+
+        if (targetIsGodAdmin && !actorIsGodAdmin) {
+            throw new UserRoleOperationNotAllowedException("Only a GOD_ADMIN can edit a GOD_ADMIN account");
+        }
+    }
+
     private void addHateoasLinks(UserDTO dto) {
         dto.add(linkTo(methodOn(UserController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).findAll()).withRel("findAllUsers").withType("GET"));
         dto.add(linkTo(methodOn(UserController.class).create(dto, null)).withRel("createUser").withType("POST"));
-        dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), dto)).withRel("updateUser").withType("PUT"));
+        dto.add(linkTo(methodOn(UserController.class).update(dto.getId(), dto, null)).withRel("updateUser").withType("PUT"));
         dto.add(linkTo(methodOn(UserController.class).disableUser(dto.getId(), null)).withRel("disableUser").withType("PATCH"));
         dto.add(linkTo(methodOn(UserController.class).delete(dto.getId())).withRel("deleteUser").withType("DELETE"));
     }
