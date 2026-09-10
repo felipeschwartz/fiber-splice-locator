@@ -35,23 +35,19 @@ spring:
     open-in-view: false
   profiles:
     active: dev
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
+# Render bloqueia conexões de saída nas portas de SMTP (587/465/25), então
+# e-mail é enviado via API HTTP da Resend em vez de JavaMailSender/SMTP.
+# "from" só pode ser um endereço arbitrário depois de verificar um domínio
+# próprio no dashboard da Resend; sem isso, use o domínio de sandbox deles.
+resend:
+  api-key: ${RESEND_API_KEY}
+  from: ${RESEND_FROM:onboarding@resend.dev}
 
 security:
   jwt:
     secret: fiber-splice-locator-secret-key-2026
-    expiration: 86400000
+    expiration: 28800000
 
 logging:
   level:
