@@ -20,11 +20,16 @@ public class PushNotificationService {
         if (pushToken == null || pushToken.isBlank()) return;
 
         try {
-            restClient.post()
+            // A API do Expo quase sempre responde 200 OK mesmo quando a entrega
+            // falha de verdade (ex.: credencial FCM inválida, token expirado) —
+            // o erro real vem dentro do corpo da resposta, não no status HTTP.
+            // Por isso logamos o corpo inteiro, em vez de descartar a resposta.
+            String response = restClient.post()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("to", pushToken, "title", title, "body", body))
                     .retrieve()
-                    .toBodilessEntity();
+                    .body(String.class);
+            logger.info("Push notification response for {}: {}", pushToken, response);
         } catch (Exception e) {
             logger.warn("Failed to send push notification to {}: {}", pushToken, e.getMessage());
         }
