@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,6 +18,7 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
@@ -26,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.junit.jupiter.api.Assertions.assertNotNull; // Importar para as asserções
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,7 +38,7 @@ class CEOControllerIT {
     private MockMvc mockMvc;
 
     @Autowired
-    private JsonMapper objectMapper; // Usado para serializar o DTO para JSON
+    private JsonMapper objectMapper;
 
     @MockitoBean
     private CEOService ceoService;
@@ -58,9 +60,29 @@ class CEOControllerIT {
 
     @Test
     void findAll_ReturnsOk() throws Exception {
-        when(ceoService.findAll()).thenReturn(List.of(ceoDTO));
+        when(ceoService.findAll(any(), any())).thenReturn(new PageImpl<>(List.of(ceoDTO)));
 
         mockMvc.perform(get("/api/ceo/v1")
+                        .with(user("technician").roles("FIELD_TECHNICIAN")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void findAll_WithStatusFilter_ReturnsOk() throws Exception {
+        when(ceoService.findAll(any(), eq(List.of(CEOStatus.DAMAGED)))).thenReturn(new PageImpl<>(List.of(ceoDTO)));
+
+        mockMvc.perform(get("/api/ceo/v1").param("status", "DAMAGED")
+                        .with(user("technician").roles("FIELD_TECHNICIAN")))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void findAll_WithMultipleStatusFilters_ReturnsOk() throws Exception {
+        when(ceoService.findAll(any(), eq(List.of(CEOStatus.DAMAGED, CEOStatus.UNDER_MAINTENANCE))))
+                .thenReturn(new PageImpl<>(List.of(ceoDTO)));
+
+        mockMvc.perform(get("/api/ceo/v1")
+                        .param("status", "DAMAGED", "UNDER_MAINTENANCE")
                         .with(user("technician").roles("FIELD_TECHNICIAN")))
                 .andExpect(status().isOk());
     }
@@ -77,37 +99,23 @@ class CEOControllerIT {
 
     @Test
     void create_ReturnsCreated() throws Exception {
-        // Mock do serviço para retornar o ceoDTO quando create for chamado
         when(ceoService.create(any(CEODTO.class))).thenReturn(ceoDTO);
 
-        // Realiza a requisição POST usando MockMvc
         String responseContent = mockMvc.perform(post("/api/ceo/v1")
-                        .with(user("admin").roles("ADMIN")) // Simula um usuário ADMIN
+                        .with(user("admin").roles("ADMIN"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(ceoDTO))) // Corpo da requisição
-                .andExpect(status().isCreated()) // Espera status 201 Created
-                .andReturn().getResponse().getContentAsString(); // Captura o corpo da resposta
+                        .content(objectMapper.writeValueAsString(ceoDTO)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
 
-        // Desserializa a resposta para um CEODTO
         CEODTO createdCEO = objectMapper.readValue(responseContent, CEODTO.class);
 
-        // Realiza as asserções sobre o objeto retornado
         assertNotNull(createdCEO.getId());
         assertNotNull(createdCEO.getBoxNumber());
         assertNotNull(createdCEO.getNotes());
         assertNotNull(createdCEO.getAddress());
         assertNotNull(createdCEO.getStatus());
-        // Adicione mais asserções conforme necessário para o seu CEODTO
     }
-
-//    @Test
-//    void create_WithFieldTechnicianRole_ReturnsForbidden() throws Exception {
-//        mockMvc.perform(post("/api/ceo/v1")
-//                        .with(user("technician").roles("FIELD_TECHNICIAN"))
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content(objectMapper.writeValueAsString(ceoDTO)))
-//                .andExpect(status().isForbidden());
-//    }
 
     @Test
     void update_ReturnsOk() throws Exception {

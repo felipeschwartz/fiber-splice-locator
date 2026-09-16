@@ -14,6 +14,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -54,13 +59,70 @@ class CEOServiceTest {
 
     @Test
     void findAll_ReturnsListOfCEODTO() {
-        when(ceoRepository.findAll()).thenReturn(List.of(ceo));
+        Pageable pageable = PageRequest.of(0, 20);
+        when(ceoRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(ceo)));
         when(ceoMapper.toDTO(ceo)).thenReturn(ceoDTO);
 
-        List<CEODTO> result = ceoService.findAll();
+        Page<CEODTO> result = ceoService.findAll(pageable, null);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(1, result.getContent().size());
+    }
+
+    @Test
+    void findAll_WithStatusFilter_ReturnsOnlyMatchingCEODTO() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<CEOStatus> statuses = List.of(CEOStatus.DAMAGED);
+        when(ceoRepository.findByStatusIn(statuses, pageable)).thenReturn(new PageImpl<>(List.of(ceo)));
+        when(ceoMapper.toDTO(ceo)).thenReturn(ceoDTO);
+
+        Page<CEODTO> result = ceoService.findAll(pageable, statuses);
+
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        verify(ceoRepository, never()).findAll(pageable);
+    }
+
+    @Test
+    void findAll_WithMultipleStatuses_ReturnsCombinedCEODTO() {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<CEOStatus> statuses = List.of(CEOStatus.DAMAGED, CEOStatus.UNDER_MAINTENANCE);
+        when(ceoRepository.findByStatusIn(statuses, pageable)).thenReturn(new PageImpl<>(List.of(ceo)));
+        when(ceoMapper.toDTO(ceo)).thenReturn(ceoDTO);
+
+        Page<CEODTO> result = ceoService.findAll(pageable, statuses);
+
+        assertNotNull(result);
+        verify(ceoRepository).findByStatusIn(statuses, pageable);
+    }
+
+    @Test
+    void findAll_SortedByStatus_UsesSeverityRanking() {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Order.asc("status")));
+        Pageable plainPageable = PageRequest.of(0, 20);
+        when(ceoRepository.findAllOrderByStatusSeverity(1, plainPageable)).thenReturn(new PageImpl<>(List.of(ceo)));
+        when(ceoMapper.toDTO(ceo)).thenReturn(ceoDTO);
+
+        Page<CEODTO> result = ceoService.findAll(pageable, null);
+
+        assertNotNull(result);
+        verify(ceoRepository).findAllOrderByStatusSeverity(1, plainPageable);
+        verify(ceoRepository, never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void findAll_SortedByStatusDescendingWithFilter_UsesSeverityRankingWithFilter() {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Order.desc("status")));
+        Pageable plainPageable = PageRequest.of(0, 20);
+        List<CEOStatus> statuses = List.of(CEOStatus.DAMAGED, CEOStatus.UNDER_MAINTENANCE);
+        when(ceoRepository.findByStatusInOrderByStatusSeverity(List.of("DAMAGED", "UNDER_MAINTENANCE"), -1, plainPageable))
+                .thenReturn(new PageImpl<>(List.of(ceo)));
+        when(ceoMapper.toDTO(ceo)).thenReturn(ceoDTO);
+
+        Page<CEODTO> result = ceoService.findAll(pageable, statuses);
+
+        assertNotNull(result);
+        verify(ceoRepository).findByStatusInOrderByStatusSeverity(List.of("DAMAGED", "UNDER_MAINTENANCE"), -1, plainPageable);
     }
 
     @Test

@@ -2,20 +2,26 @@ package github.felipeschwartz.fiber_splice_locator.service;
 
 
 import github.felipeschwartz.fiber_splice_locator.controller.CEOController;
+import github.felipeschwartz.fiber_splice_locator.file.exporter.contract.FileExporter;
+import github.felipeschwartz.fiber_splice_locator.file.exporter.factory.FileExporterFactory;
 import github.felipeschwartz.fiber_splice_locator.mapper.CEOMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
-import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
+import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -26,22 +32,40 @@ public class CEOService {
 
     private final CEORepository ceoRepository;
     private final CEOMapper ceoMapper;
+    private final FileExporterFactory exporter;
 
-    public CEOService(CEORepository ceoRepository, CEOMapper ceoMapper) {
+    public CEOService(CEORepository ceoRepository, CEOMapper ceoMapper, FileExporterFactory exporter) {
         this.ceoRepository = ceoRepository;
         this.ceoMapper = ceoMapper;
+        this.exporter = exporter;
     }
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public List<CEODTO> findAll() {
-        logger.info("Finding all CEOs!");
-        List<CEODTO> ceoDTOS = ceoRepository.findAll()
-                .stream()
-                .map(ceoMapper::toDTO)
-                .collect(Collectors.toList());
-        ceoDTOS.forEach(this::addHateoasLinks);
-        return ceoDTOS;
+    public Page<CEODTO> findAll(Pageable pageable, List<CEOStatus> statuses) {
+        logger.info("Finding all CEOs! page={}, size={}, statuses={}", pageable.getPageNumber(), pageable.getPageSize(), statuses);
+        boolean hasStatusFilter = statuses != null && !statuses.isEmpty();
+
+        Sort.Order statusOrder = pageable.getSort().getOrderFor("status");
+        Page<CEO> page;
+        if (statusOrder != null) {
+            // Ordenação alfabética do enum não corresponde à gravidade que faz
+            // sentido pro usuário (Danificada/Em manutenção antes de Padronizada),
+            // então essa combinação usa uma query nativa com ranking próprio.
+            int direction = statusOrder.isAscending() ? 1 : -1;
+            Pageable plainPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+            page = hasStatusFilter
+                    ? ceoRepository.findByStatusInOrderByStatusSeverity(statuses.stream().map(Enum::name).toList(), direction, plainPageable)
+                    : ceoRepository.findAllOrderByStatusSeverity(direction, plainPageable);
+        } else {
+            page = hasStatusFilter
+                    ? ceoRepository.findByStatusIn(statuses, pageable)
+                    : ceoRepository.findAll(pageable);
+        }
+
+        Page<CEODTO> ceoDTOs = page.map(ceoMapper::toDTO);
+        ceoDTOs.forEach(this::addHateoasLinks);
+        return ceoDTOs;
     }
 
     @Transactional(readOnly = true)
@@ -55,6 +79,22 @@ public class CEOService {
         return ceoDTO;
     }
 
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    public Resource exportPage(Pageable pageable, String acceptHeader) {
+        logger.info("Exporting CEOs! page={}, size={}, acceptHeader={}", pageable.getPageNumber(), pageable.getPageSize(), acceptHeader);
+
+        var ceos = ceoRepository.findAll(pageable).map(ceo -> ceoMapper.toDTO(ceo))
+                .getContent();
+
+        try {
+            FileExporter exporter = this.exporter.getExporter(acceptHeader);
+            return exporter.exportFile(ceos);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during file export!", e);
+        }
+    }
 
 
     @Transactional
@@ -132,9 +172,11 @@ public class CEOService {
 
     private void addHateoasLinks(CEODTO dto) {
         dto.add(linkTo(methodOn(CEOController.class).findById(dto.getId())).withSelfRel().withType("GET"));
-        dto.add(linkTo(methodOn(CEOController.class).findAll()).withRel("findAllCEOs").withType("GET"));
+        dto.add(linkTo(methodOn(CEOController.class).findAll(null, null)).withRel("findAllCEOs").withType("GET"));
         dto.add(linkTo(methodOn(CEOController.class).create(null)).withRel("createCEO").withType("POST"));
         dto.add(linkTo(methodOn(CEOController.class).update(dto.getId(), dto)).withRel("updateCEO").withType("PUT"));
         dto.add(linkTo(methodOn(CEOController.class).delete(dto.getId())).withRel("deleteCEO").withType("DELETE"));
+        dto.add(linkTo(methodOn(CEOController.class).exportPage(1, 12, "asc", null))
+                .withRel("exportPage").withType("GET"));
     }
 }
