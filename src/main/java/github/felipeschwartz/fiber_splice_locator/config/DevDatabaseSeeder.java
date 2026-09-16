@@ -16,7 +16,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +29,44 @@ import java.util.UUID;
 public class DevDatabaseSeeder implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DevDatabaseSeeder.class);
+
+    private static final int TOTAL_CEOS = 500;
+
+    private static final String[] STREET_TYPES = {"Rua", "Avenida", "Travessa", "Alameda"};
+
+    private static final String[] STREET_NAMES = {
+            "Ipiranga", "Osvaldo Aranha", "Independência", "Dos Andradas", "Assis Brasil",
+            "Protásio Alves", "Padre Chagas", "Carlos Gomes", "General Câmara", "Marechal Floriano Peixoto",
+            "Cristóvão Colombo", "Fernandes Vieira", "João Alfredo", "Getúlio Vargas", "Riachuelo",
+            "Bento Gonçalves", "Voluntários da Pátria", "Loureiro da Silva", "Vinte de Setembro", "Praia de Belas",
+            "Doutor Barcelos", "Wenceslau Escobar", "Coronel Bordini", "Goethe", "Félix da Cunha",
+            "José do Patrocínio", "Sarmento Leite", "João Pessoa", "Botafogo", "Silva Só"
+    };
+
+    private static final String[] NEIGHBORHOODS = {
+            "Centro Histórico", "Cidade Baixa", "Bom Fim", "Moinhos de Vento", "Petrópolis",
+            "Menino Deus", "Praia de Belas", "Cristal", "Tristeza", "Ipanema",
+            "Vila Assunção", "Jardim Botânico", "Partenon", "Santana", "Rio Branco",
+            "Auxiliadora", "Higienópolis", "São Geraldo", "Navegantes", "Floresta",
+            "Farroupilha", "Azenha", "Bela Vista", "Chácara das Pedras", "Três Figueiras", "Passo da Areia"
+    };
+
+    private static final String[] REFERENCE_POINTS = {
+            "Próximo à praça", "Em frente à escola", "Ao lado do mercado", "Próximo ao ponto de ônibus",
+            "Esquina com a farmácia", "Em frente à igreja", "Próximo ao posto de gasolina", "Ao lado da padaria",
+            "Em frente ao supermercado", "Próximo à quadra de esportes", "Ao lado da academia", "Em frente ao posto de saúde"
+    };
+
+    private static final String[] CEO_NOTES = {
+            "Caixa aérea em poste simples", "Caixa aérea em poste duplo", "Caixa subterrânea",
+            "Caixa em muro lateral", "Instalação recente", "Caixa com acesso restrito",
+            "Caixa próxima a cruzamento movimentado", "Caixa em condomínio residencial"
+    };
+
+    // Coordenadas centradas em Porto Alegre/RS, com variação suficiente pra
+    // cobrir a região metropolitana sem sair muito da cidade.
+    private static final double BASE_LATITUDE = -30.0346;
+    private static final double BASE_LONGITUDE = -51.2177;
 
     private final UserRepository userRepository;
     private final CEORepository ceoRepository;
@@ -154,7 +196,49 @@ public class DevDatabaseSeeder implements CommandLineRunner {
                 "Muro lateral do prédio", "Cidade Baixa", "Porto Alegre"));
         ceo5.setStatus(CEOStatus.STANDARDIZED);
 
-        return ceoRepository.saveAll(List.of(ceo1, ceo2, ceo3, ceo4, ceo5));
+        List<CEO> ceos = new ArrayList<>(List.of(ceo1, ceo2, ceo3, ceo4, ceo5));
+        // CEO-002 (DAMAGED) e CEO-003 (UNDER_MAINTENANCE) acima já contam pra cota de 1%;
+        // as 495 geradas aqui completam os 500 no total, com mais 3 nesses status.
+        ceos.addAll(generateAdditionalCEOs(6, TOTAL_CEOS, 3));
+
+        return ceoRepository.saveAll(ceos);
+    }
+
+    private List<CEO> generateAdditionalCEOs(int fromBoxNumber, int toBoxNumberInclusive, int extraDamagedOrUnderMaintenance) {
+        int count = toBoxNumberInclusive - fromBoxNumber + 1;
+        Random random = new Random(42);
+
+        Set<Integer> damagedOrMaintenanceIndexes = new LinkedHashSet<>();
+        while (damagedOrMaintenanceIndexes.size() < extraDamagedOrUnderMaintenance) {
+            damagedOrMaintenanceIndexes.add(random.nextInt(count));
+        }
+
+        List<CEO> ceos = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            CEO ceo = new CEO();
+            ceo.setBoxNumber(String.format("CEO-%03d", fromBoxNumber + i));
+            ceo.setNotes(CEO_NOTES[random.nextInt(CEO_NOTES.length)]);
+            ceo.setAddress(buildRandomAddress(random));
+            ceo.setStatus(damagedOrMaintenanceIndexes.contains(i)
+                    ? (i % 2 == 0 ? CEOStatus.DAMAGED : CEOStatus.UNDER_MAINTENANCE)
+                    : CEOStatus.STANDARDIZED);
+            ceos.add(ceo);
+        }
+        return ceos;
+    }
+
+    private Address buildRandomAddress(Random random) {
+        String addressType = STREET_TYPES[random.nextInt(STREET_TYPES.length)];
+        String street = STREET_NAMES[random.nextInt(STREET_NAMES.length)];
+        String streetNumber = String.valueOf(100 + random.nextInt(9900));
+        String neighborhood = NEIGHBORHOODS[random.nextInt(NEIGHBORHOODS.length)];
+        String referencePoint = REFERENCE_POINTS[random.nextInt(REFERENCE_POINTS.length)];
+
+        double latitude = BASE_LATITUDE + (random.nextDouble() - 0.5) * 0.12;
+        double longitude = BASE_LONGITUDE + (random.nextDouble() - 0.5) * 0.14;
+        String geoLocation = String.format(Locale.US, "%.6f,%.6f", latitude, longitude);
+
+        return buildAddress(geoLocation, addressType, street, streetNumber, referencePoint, neighborhood, "Porto Alegre");
     }
 
     private Address buildAddress(
