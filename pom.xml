@@ -31,6 +31,8 @@
 		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 		<springdoc.version>3.0.2</springdoc.version>
 		<testcontainers.version>2.0.5</testcontainers.version>
+		<apache.poi.version>5.5.1</apache.poi.version>
+		<apache.commons.csv.version>1.14.1</apache.commons.csv.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -53,11 +55,6 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -106,6 +103,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>${apache.commons.csv.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${apache.poi.version}</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -158,10 +167,6 @@
 						<configuration>
 							<annotationProcessorPaths>
 								<path>
-									<groupId>org.projectlombok</groupId>
-									<artifactId>lombok</artifactId>
-								</path>
-								<path>
 									<groupId>org.mapstruct</groupId>
 									<artifactId>mapstruct-processor</artifactId>
 									<version>${org.mapstruct.version}</version>
@@ -178,10 +183,6 @@
 						<configuration>
 							<annotationProcessorPaths>
 								<path>
-									<groupId>org.projectlombok</groupId>
-									<artifactId>lombok</artifactId>
-								</path>
-								<path>
 									<groupId>org.mapstruct</groupId>
 									<artifactId>mapstruct-processor</artifactId>
 									<version>${org.mapstruct.version}</version>
@@ -191,11 +192,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Adição do plugin Maven Surefire para configurar o Mockito como agente -->
+			<!-- javaagent explícito p/ silenciar o warning do Byte Buddy em versões novas do JDK -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.5</version> <!-- Use a versão mais recente -->
+				<version>3.2.5</version>
 				<configuration>
 					<argLine>-javaagent:"${settings.localRepository}/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar"</argLine>
 				</configuration>

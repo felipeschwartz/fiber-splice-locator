@@ -2,7 +2,6 @@ package github.felipeschwartz.fiber_splice_locator.config;
 
 
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,23 +11,34 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
-    @Getter
     private Long id;
-    @Getter
     private String email;
-    @Getter
     private String password;
-    @Getter
     private String name;
-
-    @Getter
     private Set<String> roles;
-
-    @Getter
     private boolean active;
 
-
     private Collection<? extends GrantedAuthority> authorities;
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Set<String> getRoles() {
+        return roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
