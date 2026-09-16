@@ -6,6 +6,8 @@ import github.felipeschwartz.fiber_splice_locator.service.ServiceOrderPhotoServi
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -22,6 +23,8 @@ import java.util.List;
 @RequestMapping("/api/service_order_photos/v1")
 @Tag(name = "Service Order Photos", description = "Endpoint for managing Service Order Photos")
 public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerDocs {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServiceOrderPhotoController.class);
 
     private final ServiceOrderPhotoService service;
 
@@ -32,18 +35,21 @@ public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerD
     @GetMapping(value = "/service-order/{serviceOrderId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<List<ServiceOrderPhotoDTO>> findAllByServiceOrder(@PathVariable("serviceOrderId") Long serviceOrderId) {
+        logger.info("Received request to list photos for service order {}", serviceOrderId);
         return ResponseEntity.ok(service.findAllByServiceOrder(serviceOrderId));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ServiceOrderPhotoDTO> findById(@PathVariable("id") Long id) {
+        logger.info("Received request to fetch photo {}", id);
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/{id}/content")
     @Override
     public ResponseEntity<Resource> content(@PathVariable("id") Long id) {
+        logger.info("Received request to serve content for photo {}", id);
         ServiceOrderPhotoService.LoadedPhoto loaded = service.loadContent(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(loaded.contentType()))
@@ -59,7 +65,9 @@ public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerD
     public ResponseEntity<ServiceOrderPhotoDTO> upload(
             @PathVariable("serviceOrderId") Long serviceOrderId,
             @RequestParam("file") MultipartFile file
-    ) throws IOException {
+    ) {
+        logger.info("Received photo upload for service order {}: {} ({} bytes)",
+                serviceOrderId, file.getOriginalFilename(), file.getSize());
         ServiceOrderPhotoDTO created = service.savePhoto(serviceOrderId, file);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .replacePath("/api/service_order_photos/v1/{id}")
@@ -78,12 +86,14 @@ public class ServiceOrderPhotoController implements ServiceOrderPhotoControllerD
             @PathVariable("id") Long id,
             @RequestBody @Valid ServiceOrderPhotoDTO serviceOrderPhotoDTO
     ) {
+        logger.info("Received request to update photo {}", id);
         return ResponseEntity.ok(service.update(id, serviceOrderPhotoDTO));
     }
 
     @DeleteMapping("/{id}")
     @Override
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
+        logger.info("Received request to delete photo {}", id);
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

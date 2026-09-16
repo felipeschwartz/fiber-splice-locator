@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.config.FileStorageConfig;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderPhotoMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderPhotoDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
@@ -49,8 +50,11 @@ class ServiceOrderPhotoServiceTest {
 
     @BeforeEach
     void setUp() {
+        FileStorageConfig fileStorageConfig = new FileStorageConfig();
+        fileStorageConfig.setService_order_photos(tempDir.toString());
+
         photoService = new ServiceOrderPhotoService(
-                tempDir.toString(),
+                fileStorageConfig,
                 serviceOrderRepository,
                 photoRepository,
                 photoMapper

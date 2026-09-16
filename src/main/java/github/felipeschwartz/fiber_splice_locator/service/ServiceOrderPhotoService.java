@@ -1,11 +1,14 @@
 package github.felipeschwartz.fiber_splice_locator.service;
 
+import github.felipeschwartz.fiber_splice_locator.config.FileStorageConfig;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderPhotoMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderPhotoDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderPhoto;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.FileNotFoundException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.FileStorageException;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -46,12 +50,19 @@ public class ServiceOrderPhotoService {
     private final ServiceOrderPhotoMapper photoMapper;
 
     public ServiceOrderPhotoService(
-            @Value("${app.storage.service-order-photos}") String storagePath,
+            FileStorageConfig fileStorageConfig,
             ServiceOrderRepository serviceOrderRepository,
             ServiceOrderPhotoRepository photoRepository,
             ServiceOrderPhotoMapper photoMapper
     ) {
-        this.storageRoot = Paths.get(storagePath).toAbsolutePath().normalize();
+        Path path = Paths.get(fileStorageConfig.getService_order_photos()).toAbsolutePath().normalize();
+        this.storageRoot = path;
+        try {
+            Files.createDirectories(this.storageRoot);
+        } catch (Exception e) {
+            logger.error("Could not create storage directory: {}", this.storageRoot, e);
+            throw new FileStorageException("Could not create storage directory", e);
+        }
         this.serviceOrderRepository = serviceOrderRepository;
         this.photoRepository = photoRepository;
         this.photoMapper = photoMapper;
@@ -87,7 +98,7 @@ public class ServiceOrderPhotoService {
 
     @Transactional
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderPhotoDTO savePhoto(Long serviceOrderId, MultipartFile file) throws IOException {
+    public ServiceOrderPhotoDTO savePhoto(Long serviceOrderId, MultipartFile file) {
         validateFile(file);
 
         ServiceOrder serviceOrder = serviceOrderRepository.findById(serviceOrderId)
@@ -97,15 +108,20 @@ public class ServiceOrderPhotoService {
         String storedFileName = UUID.randomUUID() + extension;
 
         Path orderDirectory = storageRoot.resolve(serviceOrderId.toString());
-        Files.createDirectories(orderDirectory);
-
         Path targetFile = orderDirectory.resolve(storedFileName).normalize();
 
         if (!targetFile.startsWith(storageRoot)) {
-            throw new SecurityException("Invalid file path");
+            logger.error("Rejected photo upload for Service Order {}: resolved path {} escapes storage root", serviceOrderId, targetFile);
+            throw new FileStorageException("Invalid file path: " + targetFile);
         }
 
-        Files.copy(file.getInputStream(), targetFile, StandardCopyOption.REPLACE_EXISTING);
+        try {
+            Files.createDirectories(orderDirectory);
+            Files.copy(file.getInputStream(), targetFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Could not store photo for Service Order {}", serviceOrderId, e);
+            throw new FileStorageException("Could not store photo for Service Order " + serviceOrderId, e);
+        }
 
         int nextOrder = photoRepository.countByServiceOrder_ServiceOrderId(serviceOrderId) + 1;
 
@@ -134,6 +150,7 @@ public class ServiceOrderPhotoService {
                 .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
         photoMapper.updateEntityFromDTO(dto, entity);
         ServiceOrderPhotoDTO saved = photoMapper.toDTO(photoRepository.save(entity));
+        logger.info("Photo {} updated", saved.getId());
         attachContentUrl(saved);
         return saved;
     }
@@ -153,6 +170,7 @@ public class ServiceOrderPhotoService {
         }
 
         photoRepository.delete(photo);
+        logger.info("Photo {} deleted", id);
     }
 
     @Transactional(readOnly = true)
@@ -164,7 +182,8 @@ public class ServiceOrderPhotoService {
 
         Path file = storageRoot.resolve(photo.getStoragePath()).normalize();
         if (!file.startsWith(storageRoot) || !Files.exists(file)) {
-            throw new EntityNotFoundException("Photo file not found on disk: " + id);
+            logger.warn("Photo {} has a database record but the file is missing on disk: {}", id, file);
+            throw new FileNotFoundException("Photo file not found on disk: " + id);
         }
 
         return new LoadedPhoto(new FileSystemResource(file), photo.getContentType());

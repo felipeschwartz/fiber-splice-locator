@@ -8,6 +8,12 @@ app:
 spring:
   main:
     allow-circular-references: true
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 20MB
+      max-request-size: 20MB
   application:
     name: fiber_splice_locator
   datasource:
@@ -31,6 +37,7 @@ spring:
 
 resend:
   api-key: test-key
+  from: test@example.com
 
 security:
   jwt:
