@@ -1,16 +1,15 @@
 package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 
-import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
-import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidResetTokenException;
-import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
-import github.felipeschwartz.fiber_splice_locator.service.exceptions.UserRoleOperationNotAllowedException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -116,6 +115,25 @@ public class ControllerExceptionHandler {
                 System.currentTimeMillis(), status.value(), "Bad Request", exception.getMessage(), request.getRequestURI()
         );
         return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileNotFoundExceptions(Exception ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileStorageExceptions(Exception ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
