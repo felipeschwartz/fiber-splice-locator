@@ -42,10 +42,7 @@ public class SecurityConfigDev {
         return http
                 .csrf(csrf -> csrf.disable())
 
-                // Sem isto, a Security nunca aplica o CORS configurado em
-                // WebConfig.addCorsMappings — o preflight OPTIONS cai como
-                // anônimo em anyRequest().authenticated(), leva 401 sem os
-                // headers de CORS, e o navegador só reporta "erro de rede".
+                // Precisa estar habilitado aqui p/ o CORS do WebConfig valer no preflight OPTIONS.
                 .cors(Customizer.withDefaults())
 
                 .sessionManagement(session ->

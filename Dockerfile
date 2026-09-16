@@ -3,7 +3,7 @@ FROM eclipse-temurin:25.0.3_9-jdk-noble AS builder
 WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
-RUN chmod +x mvnw  # Adicione esta linha
+RUN chmod +x mvnw
 RUN ./mvnw dependency:go-offline
 COPY src ./src
 RUN ./mvnw clean install -DskipTests
@@ -11,8 +11,7 @@ RUN ./mvnw clean install -DskipTests
 # Stage de execução
 FROM eclipse-temurin:25.0.3_9-jre-noble
 WORKDIR /app
-# Sem isso, o Render roda o container em UTC e LocalDateTime.now() (usado em
-# toda a aplicação) fica 3h à frente do horário real de Brasília.
+# Container roda em UTC por padrão no Render, o que desalinha os LocalDateTime.now() da app.
 ENV TZ=America/Sao_Paulo
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080

@@ -34,8 +34,6 @@ public class EmailService {
 
     @Async
     public void sendServiceOrderAssignedEmail(String to, Long serviceOrderId, String ceoBoxNumber) {
-        // Deep link — só abre a tela da OS se o app estiver instalado no
-        // aparelho (esquema registrado em app.json/App.js do mobile).
         String link = "fibersplicelocator://service-orders/" + serviceOrderId;
 
         String text = "Você recebeu uma nova ordem de serviço.\n\n" +

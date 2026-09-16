@@ -14,9 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // trim() em cada origem: um espaço depois da vírgula (ex.: "a, b" em
-        // vez de "a,b") já faz o CORS falhar em silêncio, sem log nenhum,
-        // porque o header "Origin" do navegador nunca vem com espaço.
+        // trim() pq espaço depois da vírgula na env var já quebra o match do Origin.
         var allowedOrigins = java.util.Arrays.stream(corsOriginPatterns.split(","))
                 .map(String::trim)
                 .toArray(String[]::new);

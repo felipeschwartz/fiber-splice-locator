@@ -20,10 +20,8 @@ public class PushNotificationService {
         if (pushToken == null || pushToken.isBlank()) return;
 
         try {
-            // A API do Expo quase sempre responde 200 OK mesmo quando a entrega
-            // falha de verdade (ex.: credencial FCM inválida, token expirado) —
-            // o erro real vem dentro do corpo da resposta, não no status HTTP.
-            // Por isso logamos o corpo inteiro, em vez de descartar a resposta.
+            // Expo responde 200 mesmo em falha de entrega (credencial FCM inválida etc.);
+            // o erro de verdade só aparece no corpo, por isso logamos ele.
             String response = restClient.post()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(Map.of("to", pushToken, "title", title, "body", body))
