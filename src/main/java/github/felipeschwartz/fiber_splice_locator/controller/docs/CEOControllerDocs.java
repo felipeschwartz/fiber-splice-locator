@@ -48,8 +48,8 @@ public interface CEOControllerDocs {
 
 
     @Operation(
-            summary = "Exports a page of ceos",
-            description = "Exports a page of ceos on database, ordered by boxNumber by default. Standard Spring pagination query params apply: page, size, sort (e.g. sort=status,asc). Optionally filter by one or more statuses (repeat the status param); when sorting by status, results are ranked by severity (DAMAGED, UNDER_MAINTENANCE, STANDARDIZED, CANCELLED) instead of alphabetically.",
+            summary = "Exports all matching ceos",
+            description = "Exports every ceo matching the given filter as a single XLSX or CSV file (not paginated) — set the Accept header to the desired file's media type. Sorted by boxNumber by default; accepts the same sort param as findAll (e.g. sort=status,asc), including severity ranking when sorting by status. Optionally filter by one or more statuses (repeat the status param).",
             tags = {"CEO"},
             responses = {
                     @ApiResponse(
@@ -69,9 +69,8 @@ public interface CEOControllerDocs {
             }
     )
     ResponseEntity<Resource> exportPage(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "12") Integer size,
-            @RequestParam(value = "sort", defaultValue = "boxNumber,asc") String direction,
+            Pageable pageable,
+            @RequestParam(required = false) List<CEOStatus> status,
             HttpServletRequest request
     );
 

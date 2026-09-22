@@ -10,9 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -59,18 +57,15 @@ public class CEOController implements CEOControllerDocs {
             MediaTypes.APPLICATION_CSV_VALUE})
     @Override
     public ResponseEntity<Resource> exportPage(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "12") Integer size,
-            @RequestParam(value = "direction", defaultValue = "asc") String direction,
+            @PageableDefault(sort = "boxNumber") Pageable pageable,
+            @RequestParam(required = false) List<CEOStatus> status,
             HttpServletRequest request
     ) {
-        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "boxNumber"));
         String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
-        Resource file = service.exportPage(pageable, acceptHeader);
+        Resource file = service.exportPage(pageable, status, acceptHeader);
         var contentType = acceptHeader != null ? acceptHeader : "application/octet-stream";
         var fileExtension = MediaTypes.APPLICATION_XLSX_VALUE.equalsIgnoreCase(acceptHeader) ? ".xlsx" : ".csv";
-        var filename = "people_exported" + fileExtension;
+        var filename = "ceos_exported" + fileExtension;
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))

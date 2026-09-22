@@ -82,11 +82,11 @@ public class CEOService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
-    public Resource exportPage(Pageable pageable, String acceptHeader) {
-        logger.info("Exporting CEOs! page={}, size={}, acceptHeader={}", pageable.getPageNumber(), pageable.getPageSize(), acceptHeader);
+    public Resource exportPage(Pageable pageable, List<CEOStatus> statuses, String acceptHeader) {
+        logger.info("Exporting CEOs! statuses={}, sort={}, acceptHeader={}", statuses, pageable.getSort(), acceptHeader);
 
-        var ceos = ceoRepository.findAll(pageable).map(ceo -> ceoMapper.toDTO(ceo))
-                .getContent();
+        Pageable exportAll = PageRequest.of(0, Integer.MAX_VALUE, pageable.getSort());
+        List<CEODTO> ceos = findAll(exportAll, statuses).getContent();
 
         try {
             FileExporter exporter = this.exporter.getExporter(acceptHeader);
@@ -176,7 +176,7 @@ public class CEOService {
         dto.add(linkTo(methodOn(CEOController.class).create(null)).withRel("createCEO").withType("POST"));
         dto.add(linkTo(methodOn(CEOController.class).update(dto.getId(), dto)).withRel("updateCEO").withType("PUT"));
         dto.add(linkTo(methodOn(CEOController.class).delete(dto.getId())).withRel("deleteCEO").withType("DELETE"));
-        dto.add(linkTo(methodOn(CEOController.class).exportPage(1, 12, "asc", null))
+        dto.add(linkTo(methodOn(CEOController.class).exportPage(null, null, null))
                 .withRel("exportPage").withType("GET"));
     }
 }
