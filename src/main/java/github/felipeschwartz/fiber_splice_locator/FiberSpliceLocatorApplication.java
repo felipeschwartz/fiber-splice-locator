@@ -1,7 +1,8 @@
 package github.felipeschwartz.fiber_splice_locator;
 
-import org.springframework.boot.SpringApplication;
+import me.paulschwarz.springdotenv.spring.DotenvApplicationInitializer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
@@ -9,7 +10,11 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class FiberSpliceLocatorApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FiberSpliceLocatorApplication.class, args);
+		// spring-dotenv não se registra sozinho (sem spring.factories no jar) —
+		// precisa desse initializer manual pra carregar o .env antes do resto.
+		new SpringApplicationBuilder(FiberSpliceLocatorApplication.class)
+				.initializers(new DotenvApplicationInitializer())
+				.run(args);
 	}
 
 }
