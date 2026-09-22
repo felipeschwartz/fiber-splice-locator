@@ -1,7 +1,9 @@
 package github.felipeschwartz.fiber_splice_locator.controller;
 
+import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.config.JwtService;
 import github.felipeschwartz.fiber_splice_locator.model.dto.LoginRequestDTO;
+import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,10 +40,14 @@ class AuthControllerIT {
 
     @Test
     void login_WithValidCredentials_ReturnsToken() throws Exception {
+        User user = new User(1L, "Felipe", "felipe@example.com", "encoded-password", true);
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+
         UsernamePasswordAuthenticationToken authenticatedToken =
                 new UsernamePasswordAuthenticationToken(
-                        "felipe@example.com",
-                        "123456"
+                        userDetails,
+                        "123456",
+                        userDetails.getAuthorities()
                 );
 
         when(authenticationManager.authenticate(any()))

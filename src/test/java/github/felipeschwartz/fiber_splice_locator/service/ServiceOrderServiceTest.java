@@ -50,6 +50,12 @@ class ServiceOrderServiceTest  {
     @Mock
     private CustomUserDetails principal;
 
+    @Mock
+    private EmailService emailService;
+
+    @Mock
+    private PushNotificationService pushNotificationService;
+
     @InjectMocks
     private ServiceOrderService serviceOrderService;
 

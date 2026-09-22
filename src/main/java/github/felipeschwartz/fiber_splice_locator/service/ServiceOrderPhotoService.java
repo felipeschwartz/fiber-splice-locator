@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -206,6 +207,13 @@ public class ServiceOrderPhotoService {
     public record LoadedPhoto(Resource resource, String contentType) {}
 
     private void attachContentUrl(ServiceOrderPhotoDTO dto) {
+        // Sem uma requisição HTTP ativa (ex.: testes unitários chamando o service
+        // direto) não há contexto de servlet pra montar a URL absoluta — nesse
+        // caso simplesmente não anexa, em vez de estourar IllegalStateException.
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            return;
+        }
+
         String url = org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/api/service_order_photos/v1/{id}/content")
                 .buildAndExpand(dto.getId())

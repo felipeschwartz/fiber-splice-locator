@@ -18,10 +18,6 @@ spring:
     name: fiber_splice_locator
   datasource:
     driver-class-name: org.postgresql.Driver
-    # Mesmos nomes que o docker-compose.yml já injeta no container do backend
-    # (SPRING_DATASOURCE_*, reconhecidos nativamente pelo Spring Boot) — defina
-    # essas três no ambiente do Render antes do próximo deploy manual. Sem elas
-    # (rodando direto pelo IntelliJ, por exemplo), cai no Postgres local.
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fiber_splice_locator}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:1234567890}
@@ -35,15 +31,12 @@ spring:
   profiles:
     active: dev
 
-# Render bloqueia SMTP de saída, por isso usamos a API HTTP da Resend em vez de JavaMailSender.
 resend:
   api-key: ${RESEND_API_KEY:local-dev-key}
   from: ${RESEND_FROM:onboarding@resend.dev}
 
 security:
   jwt:
-    # Idem: JWT_SECRET precisa ser definido no ambiente do Render. O valor
-    # abaixo só serve de fallback pra rodar localmente.
     secret: ${JWT_SECRET:fiber-splice-locator-dev-only-secret-key}
     expiration: 28800000
 
