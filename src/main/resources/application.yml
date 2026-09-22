@@ -18,12 +18,13 @@ spring:
     name: fiber_splice_locator
   datasource:
     driver-class-name: org.postgresql.Driver
-    # Sem valor de produção fixo aqui — defina DB_HOST/DB_PORT/DB_NAME/DB_USERNAME/
-    # DB_PASSWORD nas variáveis de ambiente do Render antes do próximo deploy manual.
-    # Localmente, sem essas variáveis, cai nos defaults do Postgres do docker-compose.
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:fiber_splice_locator}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:1234567890}
+    # Mesmos nomes que o docker-compose.yml já injeta no container do backend
+    # (SPRING_DATASOURCE_*, reconhecidos nativamente pelo Spring Boot) — defina
+    # essas três no ambiente do Render antes do próximo deploy manual. Sem elas
+    # (rodando direto pelo IntelliJ, por exemplo), cai no Postgres local.
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fiber_splice_locator}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234567890}
   jpa:
     hibernate:
       ddl-auto: update
