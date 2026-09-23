@@ -2,6 +2,7 @@ package github.felipeschwartz.fiber_splice_locator.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.hateoas.RepresentationModel;
@@ -25,7 +26,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
     @JsonProperty
     private String password;
 
-    private Set<String> roles = new HashSet<>();
+    private Set<UserRole> roles = new HashSet<>();
 
     @Column(nullable = false)
     private Boolean active;
@@ -73,11 +74,11 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
         this.password = password;
     }
 
-    public Set<String> getRoles() {
+    public Set<UserRole> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(Set<UserRole> roles) {
         this.roles = roles;
     }
 

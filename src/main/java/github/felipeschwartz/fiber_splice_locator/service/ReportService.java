@@ -20,13 +20,13 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public List<TechnicianServiceOrderCountDTO> serviceOrdersByTechnician(LocalDate from, LocalDate to) {
         return serviceOrderRepository.countByTechnicianBetween(from.atStartOfDay(), to.atTime(LocalTime.MAX));
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public List<CeoRecurrenceDTO> ceoRecurrence(LocalDate from, LocalDate to) {
         return serviceOrderRepository.countByCeoBetween(from.atStartOfDay(), to.atTime(LocalTime.MAX));
     }

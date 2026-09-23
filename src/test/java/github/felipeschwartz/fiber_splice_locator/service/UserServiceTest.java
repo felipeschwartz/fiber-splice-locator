@@ -4,6 +4,7 @@ import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +92,7 @@ class UserServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDTO(user)).thenReturn(userDTO);
-        when(principal.getRoles()).thenReturn(Set.of("GOD_ADMIN"));
+        when(principal.getRoles()).thenReturn(Set.of(UserRole.SUPER_ADMIN));
 
         UserDTO result = userService.create(userDTO, principal);
 
@@ -103,7 +104,7 @@ class UserServiceTest {
     @Test
     void update_WhenUserExists_ReturnsUpdatedUserDTO() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(principal.getRoles()).thenReturn(Set.of("ADMIN"));
+        when(principal.getRoles()).thenReturn(Set.of(UserRole.ADMIN));
         doNothing().when(userMapper).updateEntityFromDTO(userDTO, user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toDTO(user)).thenReturn(userDTO);

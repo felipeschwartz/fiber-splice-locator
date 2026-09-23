@@ -133,7 +133,7 @@ class CEOControllerIT {
         doNothing().when(ceoService).delete(1L);
 
         mockMvc.perform(delete("/api/ceo/v1/id/{id}", 1L)
-                        .with(user("god").roles("GOD_ADMIN")))
+                        .with(user("superadmin").roles("SUPER_ADMIN")))
                 .andExpect(status().isNoContent());
     }
 

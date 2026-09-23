@@ -99,7 +99,7 @@ usuários, CEOs e ordens de serviço de exemplo. Contas para testar o login
 
 | E-mail | Senha | Perfil |
 |---|---|---|
-| god@fiberlocator.com | god123 | GOD_ADMIN |
+| superadmin@fiberlocator.com | superadmin123 | SUPER_ADMIN |
 | admin@fiberlocator.com | admin123 | ADMIN |
 | carlos.silva@fiberlocator.com | tech123 | FIELD_TECHNICIAN |
 | mariana.souza@fiberlocator.com | tech123 | FIELD_TECHNICIAN |

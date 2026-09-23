@@ -30,7 +30,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderStatusDescriptionDTO> findAll() {
         logger.info("Finding all Service Orders Status Descriptions!");
         List<ServiceOrderStatusDescriptionDTO> serviceOrders = service.findAll().stream()
@@ -41,7 +41,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderStatusDescriptionDTO> findByServiceOrderId(Long serviceOrderId) {
         logger.info("Finding Service Order Status Descriptions for service order {}", serviceOrderId);
         List<ServiceOrderStatusDescriptionDTO> list = service.findByServiceOrder_ServiceOrderIdOrderByCreatedAtAsc(serviceOrderId).stream()
@@ -52,7 +52,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderStatusDescriptionDTO findById(Long id) {
         logger.info("Finding Service Order Status Description with id {}", id);
         ServiceOrderStatusDescriptionDTO serviceOrderDTO = service.findById(id)
@@ -63,7 +63,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderStatusDescriptionDTO create(ServiceOrderStatusDescriptionDTO serviceOrderDTO) {
         logger.info("Creating one Service Order Status Description!");
         ServiceOrderStatusDescriptionDTO createdServiceOrderDTO = mapper.toDTO(
@@ -74,7 +74,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderStatusDescriptionDTO update(Long id, ServiceOrderStatusDescriptionDTO serviceOrderDTO) {
         logger.info("Updating Service Order Status Description with id {}", id);
         var entity = service.findById(id)
@@ -87,7 +87,7 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting Service Order Status Description with id {}", id);
         if (!service.existsById(id)) {

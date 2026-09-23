@@ -8,6 +8,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.ChangePasswordDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.InvalidCurrentPasswordException;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
@@ -40,7 +41,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public List<UserDTO> findAll() {
         logger.info("Finding all Users!");
         List<UserDTO> userDTOS = userRepository.findAll()
@@ -52,7 +53,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public UserDTO findById(Long id) {
         logger.info("Finding one User by ID: {}", id);
         User user = userRepository.findById(id)
@@ -77,7 +78,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public UserDTO create(UserDTO requestDTO, CustomUserDetails principal) {
         logger.info("Creating a User: {}", requestDTO.getName());
         if (requestDTO.getPassword() == null || requestDTO.getPassword().isEmpty()) {
@@ -92,17 +93,17 @@ public class UserService {
         return createdUserDTO;
     }
 
-    private Set<String> resolveRolesForCreation(Set<String> requestedRoles, CustomUserDetails principal) {
-        if (principal.getRoles().contains("GOD_ADMIN")) {
+    private Set<UserRole> resolveRolesForCreation(Set<UserRole> requestedRoles, CustomUserDetails principal) {
+        if (principal.getRoles().contains(UserRole.SUPER_ADMIN)) {
             return requestedRoles;
         }
-        return Set.of("FIELD_TECHNICIAN");
+        return Set.of(UserRole.FIELD_TECHNICIAN);
     }
 
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public UserDTO update(UserDTO updatedDTO, CustomUserDetails principal) {
         logger.info("Updating User with ID: {}", updatedDTO.getId());
 
@@ -129,7 +130,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public UserDTO disableUser(Long id, CustomUserDetails principal) {
         logger.info("Disabling User with ID: {}", id);
         User target = userRepository.findById(id)
@@ -161,7 +162,7 @@ public class UserService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting one User!");
         if (!userRepository.existsById(id)) {
@@ -176,20 +177,20 @@ public class UserService {
             throw new UserRoleOperationNotAllowedException("You cannot disable your own account");
         }
 
-        boolean targetIsPrivileged = target.getRoles().contains("GOD_ADMIN") || target.getRoles().contains("ADMIN");
-        boolean actorIsGodAdmin = principal.getRoles().contains("GOD_ADMIN");
+        boolean targetIsPrivileged = target.getRoles().contains(UserRole.SUPER_ADMIN) || target.getRoles().contains(UserRole.ADMIN);
+        boolean actorIsSuperAdmin = principal.getRoles().contains(UserRole.SUPER_ADMIN);
 
-        if (targetIsPrivileged && !actorIsGodAdmin) {
-            throw new UserRoleOperationNotAllowedException("Only a GOD_ADMIN can disable an ADMIN or GOD_ADMIN account");
+        if (targetIsPrivileged && !actorIsSuperAdmin) {
+            throw new UserRoleOperationNotAllowedException("Only a SUPER_ADMIN can disable an ADMIN or SUPER_ADMIN account");
         }
     }
 
     private void ensureCanEdit(CustomUserDetails principal, User target) {
-        boolean targetIsGodAdmin = target.getRoles().contains("GOD_ADMIN");
-        boolean actorIsGodAdmin = principal.getRoles().contains("GOD_ADMIN");
+        boolean targetIsSuperAdmin = target.getRoles().contains(UserRole.SUPER_ADMIN);
+        boolean actorIsSuperAdmin = principal.getRoles().contains(UserRole.SUPER_ADMIN);
 
-        if (targetIsGodAdmin && !actorIsGodAdmin) {
-            throw new UserRoleOperationNotAllowedException("Only a GOD_ADMIN can edit a GOD_ADMIN account");
+        if (targetIsSuperAdmin && !actorIsSuperAdmin) {
+            throw new UserRoleOperationNotAllowedException("Only a SUPER_ADMIN can edit a SUPER_ADMIN account");
         }
     }
 

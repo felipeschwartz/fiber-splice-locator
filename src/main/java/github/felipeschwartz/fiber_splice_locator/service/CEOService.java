@@ -41,7 +41,7 @@ public class CEOService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public Page<CEODTO> findAll(Pageable pageable, List<CEOStatus> statuses) {
         logger.info("Finding all CEOs! page={}, size={}, statuses={}", pageable.getPageNumber(), pageable.getPageSize(), statuses);
         boolean hasStatusFilter = statuses != null && !statuses.isEmpty();
@@ -69,7 +69,7 @@ public class CEOService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO findById(Long id) {
         logger.info("Finding one CEO by ID: {}", id);
         CEO ceo = ceoRepository.findById(id)
@@ -81,7 +81,7 @@ public class CEOService {
 
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public Resource exportPage(Pageable pageable, List<CEOStatus> statuses, String acceptHeader) {
         logger.info("Exporting CEOs! statuses={}, sort={}, acceptHeader={}", statuses, pageable.getSort(), acceptHeader);
 
@@ -98,7 +98,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO create(CEODTO requestDTO) {
         logger.info("Creating a CEO: {}", requestDTO.getBoxNumber());
         CEO ceo = ceoMapper.toEntity(requestDTO);
@@ -111,7 +111,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public CEODTO update(CEODTO updatedDTO) {
         logger.info("Updating CEO with ID: {}", updatedDTO.getId());
 
@@ -159,7 +159,7 @@ public class CEOService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting one CEO!");
         if (!ceoRepository.existsById(id)) {

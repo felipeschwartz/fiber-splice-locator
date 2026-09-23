@@ -10,6 +10,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrder;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
@@ -78,7 +79,7 @@ class ServiceOrderServiceTest  {
 
     @Test
     void findAll_ReturnsListOfServiceOrderDTO() {
-        when(principal.getRoles()).thenReturn(java.util.Set.of("ADMIN"));
+        when(principal.getRoles()).thenReturn(java.util.Set.of(UserRole.ADMIN));
         when(serviceOrderRepository.findAll()).thenReturn(List.of(serviceOrder));
         when(serviceOrderMapper.toDTO(serviceOrder)).thenReturn(serviceOrderDTO);
 

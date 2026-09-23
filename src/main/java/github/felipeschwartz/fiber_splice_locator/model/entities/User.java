@@ -1,5 +1,6 @@
 package github.felipeschwartz.fiber_splice_locator.model.entities;
 
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -27,8 +28,9 @@ public class User implements Serializable {
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private Set<String> roles = new HashSet<>();
+    private Set<UserRole> roles = new HashSet<>();
 
     @Column(nullable = false)
     private boolean active;
@@ -79,11 +81,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public Set<String> getRoles() {
+    public Set<UserRole> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(Set<UserRole> roles) {
         this.roles = roles;
     }
 

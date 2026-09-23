@@ -12,6 +12,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.ServiceOrderSta
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
@@ -53,9 +54,9 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderDTO> findAll(CustomUserDetails principal) {
-        boolean isPrivileged = principal.getRoles().contains("GOD_ADMIN") || principal.getRoles().contains("ADMIN");
+        boolean isPrivileged = principal.getRoles().contains(UserRole.SUPER_ADMIN) || principal.getRoles().contains(UserRole.ADMIN);
         List<ServiceOrder> entities = isPrivileged
                 ? serviceOrderRepository.findAll()
                 : serviceOrderRepository.findByUser_IdOrderByCreatedAtDesc(principal.getId());
@@ -68,7 +69,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public List<ServiceOrderDTO> findByCeoId(Long ceoId) {
         List<ServiceOrderDTO> serviceOrders = serviceOrderRepository.findByCeo_IdOrderByCreatedAtDesc(ceoId).stream()
                 .map(serviceOrderMapper::toDTO)
@@ -78,7 +79,7 @@ public class ServiceOrderService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO findById(Long id) {
         ServiceOrderDTO dto = serviceOrderRepository.findById(id)
                 .map(serviceOrderMapper::toDTO)
@@ -88,7 +89,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO create(ServiceOrderDTO request) {
         logger.info("Creating one Service Order!");
         CEO ceo = findCeo(request);
@@ -101,7 +102,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public ServiceOrderDTO open(ServiceOrderDTO request) {
         logger.info("Opening a Service Order and changing CEO status");
         if (request == null || request.getCeo() == null || request.getCeo().getId() == null) {
@@ -130,7 +131,7 @@ public class ServiceOrderService {
 
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO update(Long id, ServiceOrderDTO dto) {
         ServiceOrder entity = serviceOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
@@ -141,7 +142,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO attend(Long id, ServiceOrderAttendanceDTO request) {
         ServiceOrder entity = serviceOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
@@ -166,7 +167,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ServiceOrderDTO cancel(Long id) {
         ServiceOrder entity = serviceOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
@@ -188,13 +189,13 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN')")
     public ServiceOrderDTO assignTechnician(Long serviceOrderId, Long userId) {
         ServiceOrder entity = serviceOrderRepository.findById(serviceOrderId)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + serviceOrderId));
         User technician = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Technician not found: " + userId));
-        if (!technician.getRoles().contains("FIELD_TECHNICIAN")) {
+        if (!technician.getRoles().contains(UserRole.FIELD_TECHNICIAN)) {
             throw new IllegalArgumentException("User is not a field technician: " + userId);
         }
         entity.setUser(technician);
@@ -205,7 +206,7 @@ public class ServiceOrderService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('GOD_ADMIN')")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     public void delete(Long id) {
         if (!serviceOrderRepository.existsById(id)) {
             throw new EntityNotFoundException("Service order not found: " + id);

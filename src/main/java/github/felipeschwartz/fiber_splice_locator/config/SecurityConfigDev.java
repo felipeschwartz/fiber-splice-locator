@@ -73,7 +73,7 @@ public class SecurityConfigDev {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/reports/v1/**"
-                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
+                        ).hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/user/v1/me",
@@ -85,15 +85,15 @@ public class SecurityConfigDev {
                         ).authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/user/v1/**")
-                        .hasAnyRole("GOD_ADMIN", "ADMIN")
+                        .hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.PATCH,
                                 "/api/service_orders/v1/*/assign-technician"
-                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
+                        ).hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/user/v1"
-                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
+                        ).hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers(
                                 HttpMethod.PATCH,
                                 "/api/user/v1/me/push-token"
@@ -101,18 +101,18 @@ public class SecurityConfigDev {
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/user/v1/**"
-                        ).hasAnyRole("GOD_ADMIN", "ADMIN")
+                        ).hasAnyRole("SUPER_ADMIN", "ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/user/v1/**"
-                        ).hasRole("GOD_ADMIN")
+                        ).hasRole("SUPER_ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/ceo/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -121,7 +121,7 @@ public class SecurityConfigDev {
                                 HttpMethod.POST,
                                 "/api/ceo/v1"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -130,7 +130,7 @@ public class SecurityConfigDev {
                                 HttpMethod.PUT,
                                 "/api/ceo/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -138,13 +138,13 @@ public class SecurityConfigDev {
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/ceo/v1/**"
-                        ).hasRole("GOD_ADMIN")
+                        ).hasRole("SUPER_ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/service_orders/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -153,7 +153,7 @@ public class SecurityConfigDev {
                                 HttpMethod.POST,
                                 "/api/service_orders/v1"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -162,7 +162,7 @@ public class SecurityConfigDev {
                                 HttpMethod.PUT,
                                 "/api/service_orders/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -170,13 +170,13 @@ public class SecurityConfigDev {
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/service_orders/v1/**"
-                        ).hasRole("GOD_ADMIN")
+                        ).hasRole("SUPER_ADMIN")
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/service_order_photos/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -185,7 +185,7 @@ public class SecurityConfigDev {
                                 HttpMethod.POST,
                                 "/api/service_order_photos/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -194,7 +194,7 @@ public class SecurityConfigDev {
                                 HttpMethod.PUT,
                                 "/api/service_order_photos/v1/**"
                         ).hasAnyRole(
-                                "GOD_ADMIN",
+                                "SUPER_ADMIN",
                                 "ADMIN",
                                 "FIELD_TECHNICIAN"
                         )
@@ -202,7 +202,7 @@ public class SecurityConfigDev {
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/service_order_photos/v1/**"
-                        ).hasRole("GOD_ADMIN")
+                        ).hasRole("SUPER_ADMIN")
 
                         .anyRequest().authenticated()
                 )

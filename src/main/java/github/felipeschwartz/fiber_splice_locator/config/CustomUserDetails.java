@@ -2,6 +2,7 @@ package github.felipeschwartz.fiber_splice_locator.config;
 
 
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +16,7 @@ public class CustomUserDetails implements UserDetails {
     private String email;
     private String password;
     private String name;
-    private Set<String> roles;
+    private Set<UserRole> roles;
     private boolean active;
 
     private Collection<? extends GrantedAuthority> authorities;
@@ -32,7 +33,7 @@ public class CustomUserDetails implements UserDetails {
         return name;
     }
 
-    public Set<String> getRoles() {
+    public Set<UserRole> getRoles() {
         return roles;
     }
 
@@ -48,9 +49,7 @@ public class CustomUserDetails implements UserDetails {
         this.active = user.getActive();
         this.roles = user.getRoles();
         this.authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(
-                        role.startsWith("ROLE_") ? role : "ROLE_" + role
-                ))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
                 .collect(Collectors.toList());
     }
 

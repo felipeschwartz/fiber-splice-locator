@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.config;
 import github.felipeschwartz.fiber_splice_locator.model.entities.*;
 import github.felipeschwartz.fiber_splice_locator.model.enums.CEOStatus;
 import github.felipeschwartz.fiber_splice_locator.model.enums.ServiceOrderStatus;
+import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.CEORepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderPhotoRepository;
 import github.felipeschwartz.fiber_splice_locator.repository.ServiceOrderRepository;
@@ -110,49 +111,49 @@ public class DevDatabaseSeeder implements CommandLineRunner {
     }
 
     private List<User> seedUsers() {
-        User god = new User();
-        god.setName("Felipe Schwartz");
-        god.setEmail("god@fiberlocator.com");
-        god.setPassword(passwordEncoder.encode("god123"));
-        god.setRoles(Set.of("GOD_ADMIN"));
-        god.setActive(true);
+        User superAdmin = new User();
+        superAdmin.setName("Felipe Schwartz");
+        superAdmin.setEmail("superadmin@fiberlocator.com");
+        superAdmin.setPassword(passwordEncoder.encode("superadmin123"));
+        superAdmin.setRoles(Set.of(UserRole.SUPER_ADMIN));
+        superAdmin.setActive(true);
 
         User admin = new User();
         admin.setName("Admin User");
         admin.setEmail("admin@fiberlocator.com");
         admin.setPassword(passwordEncoder.encode("admin123"));
-        admin.setRoles(Set.of("ADMIN"));
+        admin.setRoles(Set.of(UserRole.ADMIN));
         admin.setActive(true);
 
         User tech1 = new User();
         tech1.setName("Carlos Silva");
         tech1.setEmail("carlos.silva@fiberlocator.com");
         tech1.setPassword(passwordEncoder.encode("tech123"));
-        tech1.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech1.setRoles(Set.of(UserRole.FIELD_TECHNICIAN));
         tech1.setActive(true);
 
         User tech2 = new User();
         tech2.setName("Mariana Souza");
         tech2.setEmail("mariana.souza@fiberlocator.com");
         tech2.setPassword(passwordEncoder.encode("tech123"));
-        tech2.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech2.setRoles(Set.of(UserRole.FIELD_TECHNICIAN));
         tech2.setActive(true);
 
         User tech3 = new User();
         tech3.setName("João Pereira");
         tech3.setEmail("joao.pereira@fiberlocator.com");
         tech3.setPassword(passwordEncoder.encode("tech123"));
-        tech3.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech3.setRoles(Set.of(UserRole.FIELD_TECHNICIAN));
         tech3.setActive(false);
 
         User tech4 = new User();
         tech4.setName("Ana Costa");
         tech4.setEmail("ana.costa@fiberlocator.com");
         tech4.setPassword(passwordEncoder.encode("tech123"));
-        tech4.setRoles(Set.of("FIELD_TECHNICIAN"));
+        tech4.setRoles(Set.of(UserRole.FIELD_TECHNICIAN));
         tech4.setActive(true);
 
-        return userRepository.saveAll(List.of(god, admin, tech1, tech2, tech3, tech4));
+        return userRepository.saveAll(List.of(superAdmin, admin, tech1, tech2, tech3, tech4));
     }
 
     private List<CEO> seedCEOs() {

@@ -95,7 +95,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Creates a new user",
-            description = "Creates a new user with the provided details. Only a GOD_ADMIN can freely choose the roles; when the caller is an ADMIN, the created user's roles are forced to FIELD_TECHNICIAN regardless of what is sent.",
+            description = "Creates a new user with the provided details. Only a SUPER_ADMIN can freely choose the roles; when the caller is an ADMIN, the created user's roles are forced to FIELD_TECHNICIAN regardless of what is sent.",
             tags = {"User"},
             requestBody = @RequestBody(
                     description = "User details for creation",
@@ -119,7 +119,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Updates an existing user",
-            description = "Updates an existing user identified by their ID. Editing a GOD_ADMIN account requires a GOD_ADMIN caller.",
+            description = "Updates an existing user identified by their ID. Editing a SUPER_ADMIN account requires a SUPER_ADMIN caller.",
             tags = {"User"},
             requestBody = @RequestBody(
                     description = "Updated user details",
@@ -165,7 +165,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Disables a user",
-            description = "Disables a user identified by their ID. A user can never disable their own account. An ADMIN can only disable FIELD_TECHNICIAN accounts; disabling an ADMIN or GOD_ADMIN account requires a GOD_ADMIN caller.",
+            description = "Disables a user identified by their ID. A user can never disable their own account. An ADMIN can only disable FIELD_TECHNICIAN accounts; disabling an ADMIN or SUPER_ADMIN account requires a SUPER_ADMIN caller.",
             tags = {"User"},
             responses = {
                     @ApiResponse(
