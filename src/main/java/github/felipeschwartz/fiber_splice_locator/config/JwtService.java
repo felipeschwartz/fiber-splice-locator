@@ -32,21 +32,12 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractEmail(String token) {
+    public String extractEmail(String token) throws JwtException {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
-            return true;
-        } catch (JwtException e) {
-            return false;
-        }
     }
 }
