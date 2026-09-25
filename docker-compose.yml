@@ -1,6 +1,6 @@
 services:
   db:
-    image: felipeschwartz/postgres:18
+    image: postgres:18
     restart: unless-stopped
     environment:
       TZ: America/Sao_Paulo
@@ -44,16 +44,26 @@ services:
     volumes:
       - ./service-order-photos:/var/lib/my-application/service-order-photos
 
+  fiber-splice-locator-web:
+    image: felipeschwartz/fiber-splice-locator-web:latest
+    restart: unless-stopped
+    environment:
+      TZ: America/Sao_Paulo
+    ports:
+      - "8081:80"
+    depends_on:
+      - fiber-splice-locator
+    networks:
+      - fiber-splice-locator-network
+
   portainer:
-    image: felipeschwartz/portainer-ce:latest
+    image: portainer/portainer-ce:lts
     restart: unless-stopped
     ports:
-      - "9000:9000"
+      - "127.0.0.1:9443:9443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-    networks:
-      - fiber-splice-locator-network
 
 volumes:
   postgres_data:

@@ -44,7 +44,6 @@ public class PasswordResetService {
             ));
             emailService.sendPasswordResetCode(user.getEmail(), code);
         });
-        // E-mail não encontrado: não faz nada. O controller responde sucesso do mesmo jeito.
     }
 
     @Transactional
