@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.mapper.ServiceOrderMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.CEODTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderAttendanceDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.ServiceOrderDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.CEO;
@@ -22,6 +23,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -56,6 +58,9 @@ class ServiceOrderServiceTest  {
 
     @Mock
     private PushNotificationService pushNotificationService;
+
+    @Mock
+    private ServiceOrderAccessChecker accessChecker;
 
     @InjectMocks
     private ServiceOrderService serviceOrderService;
@@ -121,22 +126,34 @@ class ServiceOrderServiceTest  {
     }
 
     @Test
-    void update_WhenServiceOrderExists_ReturnsUpdatedServiceOrderDTO() {
+    void attend_WhenCallerMayModifyServiceOrder_SavesAttendance() {
         when(serviceOrderRepository.findById(1L)).thenReturn(Optional.of(serviceOrder));
-        doNothing().when(serviceOrderMapper).updateEntityFromDTO(serviceOrderDTO, serviceOrder);
         when(serviceOrderRepository.save(serviceOrder)).thenReturn(serviceOrder);
         when(serviceOrderMapper.toDTO(serviceOrder)).thenReturn(serviceOrderDTO);
 
-        ServiceOrderDTO result = serviceOrderService.update(1L, serviceOrderDTO);
+        ServiceOrderDTO result = serviceOrderService.attend(1L, attendance(ServiceOrderStatus.IN_PROGRESS));
 
         assertNotNull(result);
+        assertEquals(ServiceOrderStatus.IN_PROGRESS, serviceOrder.getStatus());
+        verify(accessChecker).checkCanModify(serviceOrder);
     }
 
     @Test
-    void update_WhenServiceOrderDoesNotExist_ThrowsException() {
-        when(serviceOrderRepository.findById(99L)).thenReturn(Optional.empty());
+    void attend_WhenCallerMayNotModifyServiceOrder_ThrowsAndSavesNothing() {
+        when(serviceOrderRepository.findById(1L)).thenReturn(Optional.of(serviceOrder));
+        doThrow(new AccessDeniedException("not assigned")).when(accessChecker).checkCanModify(serviceOrder);
 
-        assertThrows(EntityNotFoundException.class, () -> serviceOrderService.update(99L, serviceOrderDTO));
+        assertThrows(AccessDeniedException.class,
+                () -> serviceOrderService.attend(1L, attendance(ServiceOrderStatus.COMPLETED)));
+        assertEquals(ServiceOrderStatus.OPEN, serviceOrder.getStatus());
+        verify(serviceOrderRepository, never()).save(any());
+    }
+
+    private ServiceOrderAttendanceDTO attendance(ServiceOrderStatus status) {
+        ServiceOrderAttendanceDTO dto = new ServiceOrderAttendanceDTO();
+        dto.setStatus(status);
+        dto.setStatusDescription("Atendimento em campo");
+        return dto;
     }
 
     @Test

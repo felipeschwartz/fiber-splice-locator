@@ -49,12 +49,14 @@ public class ServiceOrderPhotoService {
     private final ServiceOrderRepository serviceOrderRepository;
     private final ServiceOrderPhotoRepository photoRepository;
     private final ServiceOrderPhotoMapper photoMapper;
+    private final ServiceOrderAccessChecker accessChecker;
 
     public ServiceOrderPhotoService(
             FileStorageConfig fileStorageConfig,
             ServiceOrderRepository serviceOrderRepository,
             ServiceOrderPhotoRepository photoRepository,
-            ServiceOrderPhotoMapper photoMapper
+            ServiceOrderPhotoMapper photoMapper,
+            ServiceOrderAccessChecker accessChecker
     ) {
         Path path = Paths.get(fileStorageConfig.getService_order_photos()).toAbsolutePath().normalize();
         this.storageRoot = path;
@@ -67,6 +69,7 @@ public class ServiceOrderPhotoService {
         this.serviceOrderRepository = serviceOrderRepository;
         this.photoRepository = photoRepository;
         this.photoMapper = photoMapper;
+        this.accessChecker = accessChecker;
     }
 
     @Transactional(readOnly = true)
@@ -104,6 +107,7 @@ public class ServiceOrderPhotoService {
 
         ServiceOrder serviceOrder = serviceOrderRepository.findById(serviceOrderId)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + serviceOrderId));
+        accessChecker.checkCanModify(serviceOrder);
 
         String extension = EXTENSION_BY_CONTENT_TYPE.getOrDefault(file.getContentType(), ".jpg");
         String storedFileName = UUID.randomUUID() + extension;
@@ -149,6 +153,7 @@ public class ServiceOrderPhotoService {
         logger.info("Updating photo with id {}", id);
         ServiceOrderPhoto entity = photoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
+        accessChecker.checkCanModify(entity.getServiceOrder());
         photoMapper.updateEntityFromDTO(dto, entity);
         ServiceOrderPhotoDTO saved = photoMapper.toDTO(photoRepository.save(entity));
         logger.info("Photo {} updated", saved.getId());
@@ -164,10 +169,14 @@ public class ServiceOrderPhotoService {
                 .orElseThrow(() -> new EntityNotFoundException("Service order photo not found: " + id));
 
         Path fileToDelete = storageRoot.resolve(photo.getStoragePath()).normalize();
-        try {
-            Files.deleteIfExists(fileToDelete);
-        } catch (IOException e) {
-            logger.warn("Could not delete physical file {}: {}", fileToDelete, e.getMessage());
+        if (!fileToDelete.startsWith(storageRoot)) {
+            logger.error("Refusing to delete {} for photo {}: path escapes storage root", fileToDelete, id);
+        } else {
+            try {
+                Files.deleteIfExists(fileToDelete);
+            } catch (IOException e) {
+                logger.warn("Could not delete physical file {}: {}", fileToDelete, e.getMessage());
+            }
         }
 
         photoRepository.delete(photo);

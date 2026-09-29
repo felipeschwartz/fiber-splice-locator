@@ -7,6 +7,7 @@ import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.ObjectNotFoundException;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.UserRoleOperationNotAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -113,6 +114,43 @@ class UserServiceTest {
 
         assertNotNull(result);
         verify(userRepository, times(1)).save(user);
+    }
+
+    @Test
+    void update_WhenAdminEditsAnotherAdmin_ThrowsAndSavesNothing() {
+        user.setRoles(Set.of(UserRole.ADMIN));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(principal.getId()).thenReturn(2L);
+        when(principal.getRoles()).thenReturn(Set.of(UserRole.ADMIN));
+
+        assertThrows(UserRoleOperationNotAllowedException.class, () -> userService.update(userDTO, principal));
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void update_WhenAdminEditsOwnAccount_Saves() {
+        user.setRoles(Set.of(UserRole.ADMIN));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(principal.getId()).thenReturn(1L);
+        when(principal.getRoles()).thenReturn(Set.of(UserRole.ADMIN));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
+
+        assertNotNull(userService.update(userDTO, principal));
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void update_WhenSuperAdminEditsAdmin_Saves() {
+        user.setRoles(Set.of(UserRole.ADMIN));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(principal.getId()).thenReturn(2L);
+        when(principal.getRoles()).thenReturn(Set.of(UserRole.SUPER_ADMIN));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toDTO(user)).thenReturn(userDTO);
+
+        assertNotNull(userService.update(userDTO, principal));
+        verify(userRepository).save(user);
     }
 
     @Test

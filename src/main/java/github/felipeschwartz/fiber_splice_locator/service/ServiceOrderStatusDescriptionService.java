@@ -23,10 +23,13 @@ public class ServiceOrderStatusDescriptionService {
 
     private final ServiceOrderStatusDescriptionRepository service;
     private final ServiceOrderStatusDescriptionMapper mapper;
+    private final ServiceOrderAccessChecker accessChecker;
 
-    public ServiceOrderStatusDescriptionService(ServiceOrderStatusDescriptionRepository service, ServiceOrderStatusDescriptionMapper mapper) {
+    public ServiceOrderStatusDescriptionService(ServiceOrderStatusDescriptionRepository service, ServiceOrderStatusDescriptionMapper mapper,
+                                                ServiceOrderAccessChecker accessChecker) {
         this.service = service;
         this.mapper = mapper;
+        this.accessChecker = accessChecker;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +82,7 @@ public class ServiceOrderStatusDescriptionService {
         logger.info("Updating Service Order Status Description with id {}", id);
         var entity = service.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order status description not found: " + id));
+        accessChecker.checkCanModify(entity.getServiceOrder());
 
         mapper.updateEntityFromDTO(serviceOrderDTO, entity);
         ServiceOrderStatusDescriptionDTO updatedServiceOrderDTO = mapper.toDTO(service.save(entity));

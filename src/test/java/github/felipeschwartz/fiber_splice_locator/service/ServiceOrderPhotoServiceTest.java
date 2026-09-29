@@ -16,8 +16,10 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +44,9 @@ class ServiceOrderPhotoServiceTest {
     @Mock
     private ServiceOrderPhotoMapper photoMapper;
 
+    @Mock
+    private ServiceOrderAccessChecker accessChecker;
+
     private ServiceOrderPhotoService photoService;
 
     private ServiceOrder serviceOrder;
@@ -57,7 +62,8 @@ class ServiceOrderPhotoServiceTest {
                 fileStorageConfig,
                 serviceOrderRepository,
                 photoRepository,
-                photoMapper
+                photoMapper,
+                accessChecker
         );
 
         serviceOrder = new ServiceOrder(1L, null, ServiceOrderStatus.OPEN, null, LocalDateTime.now(), null);
@@ -117,6 +123,36 @@ class ServiceOrderPhotoServiceTest {
 
         assertNotNull(result);
         verify(photoRepository, times(1)).save(any(ServiceOrderPhoto.class));
+    }
+
+    @Test
+    void savePhoto_WhenCallerMayNotModifyServiceOrder_ThrowsAndStoresNothing() {
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "original.jpg", "image/jpeg", "conteudo de teste".getBytes()
+        );
+        when(serviceOrderRepository.findById(1L)).thenReturn(Optional.of(serviceOrder));
+        doThrow(new AccessDeniedException("not assigned")).when(accessChecker).checkCanModify(serviceOrder);
+
+        assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(1L, file));
+        verify(photoRepository, never()).save(any());
+        assertFalse(Files.exists(tempDir.resolve("1")), "no file should be written to disk");
+    }
+
+    @Test
+    void delete_WhenStoragePathEscapesStorageRoot_KeepsTheOutsideFile() throws IOException {
+        Path storageRoot = tempDir.resolve("photos");
+        Path outsideFile = Files.writeString(tempDir.resolve("secret.txt"), "do not delete");
+        FileStorageConfig config = new FileStorageConfig();
+        config.setService_order_photos(storageRoot.toString());
+        ServiceOrderPhotoService service = new ServiceOrderPhotoService(
+                config, serviceOrderRepository, photoRepository, photoMapper, accessChecker);
+        photo.setStoragePath("../secret.txt");
+        when(photoRepository.findById(1L)).thenReturn(Optional.of(photo));
+
+        service.delete(1L);
+
+        assertTrue(Files.exists(outsideFile));
+        verify(photoRepository).delete(photo);
     }
 
     @Test

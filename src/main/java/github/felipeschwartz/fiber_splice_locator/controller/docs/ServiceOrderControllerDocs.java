@@ -69,16 +69,11 @@ public interface ServiceOrderControllerDocs {
     })
     ResponseEntity<EntityModel<ServiceOrderDTO>> open(@org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO request);
 
-    @Operation(summary = "Updates an existing service order", description = "Updates an existing service order identified by its ID.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "Updated service order details", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderDTO.class))), responses = {
-            @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
-            @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
-            @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
-    })
-    ResponseEntity<ServiceOrderDTO> update(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderDTO request);
 
-    @Operation(summary = "Updates attendance information", description = "Updates the attendance information for an existing service order.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "Attendance details", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderAttendanceDTO.class))), responses = {
+    @Operation(summary = "Updates attendance information", description = "Updates the attendance information for an existing service order. A FIELD_TECHNICIAN can only attend service orders assigned to them; ADMIN and SUPER_ADMIN can attend any.", tags = {"Service Orders"}, requestBody = @RequestBody(description = "Attendance details", required = true, content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = ServiceOrderAttendanceDTO.class))), responses = {
             @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = ServiceOrderDTO.class))),
             @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+            @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content),
             @ApiResponse(description = "Not found", responseCode = "404", content = @Content)
     })
     ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id, @org.springframework.web.bind.annotation.RequestBody @Valid ServiceOrderAttendanceDTO request);

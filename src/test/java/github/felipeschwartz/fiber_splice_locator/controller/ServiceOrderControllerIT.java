@@ -87,15 +87,12 @@ class ServiceOrderControllerIT {
     }
 
     @Test
-    void update_ReturnsOk() throws Exception {
-        when(serviceOrderService.update(eq(1L), any(ServiceOrderDTO.class)))
-                .thenReturn(serviceOrderDTO);
-
+    void put_IsNotAllowed_StatusChangesGoThroughAttendanceOrCancel() throws Exception {
         mockMvc.perform(put("/api/service_orders/v1/{id}", 1L)
                         .with(user("technician").roles("FIELD_TECHNICIAN"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(serviceOrderDTO)))
-                .andExpect(status().isOk());
+                .andExpect(status().isMethodNotAllowed());
     }
 
     @Test

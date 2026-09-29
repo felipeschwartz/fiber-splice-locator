@@ -72,13 +72,6 @@ public class ServiceOrderController implements ServiceOrderControllerDocs {
                 .body(EntityModel.of(created, created.getLinks()));
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Override
-    public ResponseEntity<ServiceOrderDTO> update(@PathVariable("id") Long id,
-                                                  @RequestBody @Valid ServiceOrderDTO request) {
-        return ResponseEntity.ok(service.update(id, request));
-    }
-
     @PostMapping(value = "/{id}/attendance", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ServiceOrderDTO> attend(@PathVariable("id") Long id,

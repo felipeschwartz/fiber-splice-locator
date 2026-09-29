@@ -23,7 +23,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
     @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @JsonProperty
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private Set<UserRole> roles = new HashSet<>();

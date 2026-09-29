@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -186,11 +187,13 @@ public class UserService {
     }
 
     private void ensureCanEdit(CustomUserDetails principal, User target) {
-        boolean targetIsSuperAdmin = target.getRoles().contains(UserRole.SUPER_ADMIN);
+        boolean isOwnAccount = Objects.equals(principal.getId(), target.getId());
+        boolean targetIsPrivileged = target.getRoles().contains(UserRole.SUPER_ADMIN) || target.getRoles().contains(UserRole.ADMIN);
         boolean actorIsSuperAdmin = principal.getRoles().contains(UserRole.SUPER_ADMIN);
 
-        if (targetIsSuperAdmin && !actorIsSuperAdmin) {
-            throw new UserRoleOperationNotAllowedException("Only a SUPER_ADMIN can edit a SUPER_ADMIN account");
+        // Sem isso, um ADMIN trocaria o e-mail de outro ADMIN e tomaria a conta pelo "esqueci minha senha".
+        if (targetIsPrivileged && !actorIsSuperAdmin && !isOwnAccount) {
+            throw new UserRoleOperationNotAllowedException("Only a SUPER_ADMIN can edit an ADMIN or SUPER_ADMIN account");
         }
     }
 

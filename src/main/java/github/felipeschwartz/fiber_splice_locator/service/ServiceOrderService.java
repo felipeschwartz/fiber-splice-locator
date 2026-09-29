@@ -40,17 +40,20 @@ public class ServiceOrderService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final PushNotificationService pushNotificationService;
+    private final ServiceOrderAccessChecker accessChecker;
 
     public ServiceOrderService(ServiceOrderRepository serviceOrderRepository,
                                ServiceOrderMapper serviceOrderMapper,
                                CEORepository ceoRepository,
-                               UserRepository userRepository, EmailService emailService, PushNotificationService pushNotificationService) {
+                               UserRepository userRepository, EmailService emailService, PushNotificationService pushNotificationService,
+                               ServiceOrderAccessChecker accessChecker) {
         this.serviceOrderRepository = serviceOrderRepository;
         this.serviceOrderMapper = serviceOrderMapper;
         this.ceoRepository = ceoRepository;
         this.userRepository = userRepository;
         this.emailService = emailService;
         this.pushNotificationService = pushNotificationService;
+        this.accessChecker = accessChecker;
     }
 
     @Transactional(readOnly = true)
@@ -132,20 +135,10 @@ public class ServiceOrderService {
 
     @Transactional
     @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderDTO update(Long id, ServiceOrderDTO dto) {
-        ServiceOrder entity = serviceOrderRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
-        serviceOrderMapper.updateEntityFromDTO(dto, entity);
-        ServiceOrderDTO result = serviceOrderMapper.toDTO(serviceOrderRepository.save(entity));
-        addHateoasLinks(result);
-        return result;
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
     public ServiceOrderDTO attend(Long id, ServiceOrderAttendanceDTO request) {
         ServiceOrder entity = serviceOrderRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Service order not found: " + id));
+        accessChecker.checkCanModify(entity);
         if (request.getStatus() == null) throw new IllegalArgumentException("Status is required");
         if (request.getStatusDescription() == null || request.getStatusDescription().isBlank()) {
             throw new IllegalArgumentException("Status description is required");
@@ -219,7 +212,6 @@ public class ServiceOrderService {
         dto.add(linkTo(methodOn(ServiceOrderController.class).findAll(null)).withRel("findAll").withType("GET"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).create(dto)).withRel("create").withType("POST"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).open(dto)).withRel("open").withType("POST"));
-        dto.add(linkTo(methodOn(ServiceOrderController.class).update(dto.getServiceOrderId(), dto)).withRel("update").withType("PUT"));
         dto.add(linkTo(methodOn(ServiceOrderController.class).delete(dto.getServiceOrderId())).withRel("delete").withType("DELETE"));
     }
 

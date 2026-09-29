@@ -119,7 +119,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Updates an existing user",
-            description = "Updates an existing user identified by their ID. Editing a SUPER_ADMIN account requires a SUPER_ADMIN caller.",
+            description = "Updates the name and email of an existing user identified by their ID. Editing an ADMIN or SUPER_ADMIN account requires a SUPER_ADMIN caller, unless it is the caller's own account. Roles, password and active status cannot be changed here.",
             tags = {"User"},
             requestBody = @RequestBody(
                     description = "Updated user details",
