@@ -1,5 +1,5 @@
 cors:
-  originPatterns: http://localhost:3000,http://localhost:4200,http://localhost:8080,http://localhost:5173,https://fiber-splice-locator-front-web.onrender.com,http://localhost:8081
+  originPatterns: http://localhost:3000,http://localhost:4200,http://localhost:8080,http://localhost:5173,http://localhost:8081
 
 app:
   storage:
