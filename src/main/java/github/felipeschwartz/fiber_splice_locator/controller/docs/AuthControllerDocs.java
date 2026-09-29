@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ public interface AuthControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
+    @SecurityRequirements
     ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request);
 
     @Operation(
@@ -52,6 +54,7 @@ public interface AuthControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
+    @SecurityRequirements
     ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request);
 
     @Operation(
@@ -69,5 +72,6 @@ public interface AuthControllerDocs {
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
+    @SecurityRequirements
     ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDTO request);
 }
