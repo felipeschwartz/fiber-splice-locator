@@ -13,7 +13,9 @@ O projeto atende a uma necessidade real da [POP-RS/RNP](https://pop-rs.rnp.br/),
 que hoje controla suas Caixas de Emenda Óptica (CEOs) por planilhas de Excel e
 fotos trocadas por WhatsApp. Este repositório é o BackEnd; o app mobile usado
 pelos técnicos em campo está em
-[fiber-splice-locator-front](https://github.com/felipeschwartz/fiber-splice-locator-front).
+[fiber-splice-locator-front-app](https://github.com/felipeschwartz/fiber-splice-locator-front-app),
+e o painel web dos administradores em
+[fiber-splice-locator-front-web](https://github.com/felipeschwartz/fiber-splice-locator-front-web).
 
 **Desenvolvedor principal:** [Felipe Schwartz](https://github.com/felipeschwartz)
 **Colaboradores:** Eduardo Ribeiro Silveira, Vorni Valpir Fagundes da Cunha
@@ -138,18 +140,25 @@ com senhas mais curtas.
 Com a aplicação rodando, o Swagger UI fica disponível em `http://localhost:8080/`
 (gerado automaticamente pelo springdoc a partir dos controllers).
 
+Para testar rotas protegidas pelo Swagger, faça login em
+`POST /api/auth/v1/login`, copie o `token` da resposta e cole no botão
+**Authorize**, no topo da página.
+
 ## Estrutura do projeto
 
 ```
 controller/   endpoints REST (um por domínio: auth, user, ceo, service order,
               fotos, descrições de status)
-service/      regras de negócio e permissões (@PreAuthorize)
+service/      regras de negócio e permissões (@PreAuthorize, técnico só
+              altera a própria OS), limite de tentativas de login
 repository/   acesso a dados (Spring Data JPA)
 mapper/       conversão entidade ↔ DTO (MapStruct)
 model/        entidades JPA, DTOs e enums
-config/       segurança (JWT, CORS, roles), seed de dados de dev
+config/       segurança (JWT, CORS, roles), seed de dados de dev e criação
+              do primeiro administrador em produção
 ```
 
 ## Repositórios relacionados
 
-- **Mobile:** [fiber-splice-locator-front](https://github.com/felipeschwartz/fiber-splice-locator-front)
+- **App mobile:** [fiber-splice-locator-front-app](https://github.com/felipeschwartz/fiber-splice-locator-front-app)
+- **Painel web:** [fiber-splice-locator-front-web](https://github.com/felipeschwartz/fiber-splice-locator-front-web)
