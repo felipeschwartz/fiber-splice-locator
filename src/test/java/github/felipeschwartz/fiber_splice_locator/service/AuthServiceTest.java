@@ -6,6 +6,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.LoginRequestDTO;
 import github.felipeschwartz.fiber_splice_locator.model.dto.LoginResponseDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
+import github.felipeschwartz.fiber_splice_locator.service.exceptions.TooManyAttemptsException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -30,11 +31,47 @@ class AuthServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
 
+    private static final String IP = "203.0.113.10";
+
     @Mock
     private JwtService jwtService;
 
+    @Mock
+    private AuthRateLimiter rateLimiter;
+
     @InjectMocks
     private AuthService authService;
+
+    @Test
+    void login_WhenRateLimited_ThrowsWithoutAuthenticating() {
+        doThrow(new TooManyAttemptsException(600)).when(rateLimiter).checkLoginAllowed("felipe@example.com", IP);
+
+        assertThrows(TooManyAttemptsException.class,
+                () -> authService.login(new LoginRequestDTO("felipe@example.com", "12345678"), IP));
+        verify(authenticationManager, never()).authenticate(any());
+    }
+
+    @Test
+    void login_WithInvalidCredentials_RecordsFailure() {
+        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad credentials"));
+
+        assertThrows(BadCredentialsException.class,
+                () -> authService.login(new LoginRequestDTO("felipe@example.com", "senhaErrada"), IP));
+        verify(rateLimiter).recordLoginFailure("felipe@example.com", IP);
+        verify(rateLimiter, never()).recordLoginSuccess(anyString(), anyString());
+    }
+
+    @Test
+    void login_WithValidCredentials_ResetsFailureCounter() {
+        CustomUserDetails principal = new CustomUserDetails(new User(1L, "Felipe", "felipe@example.com", "encodedPassword", true));
+        when(authenticationManager.authenticate(any()))
+                .thenReturn(new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
+
+        authService.login(new LoginRequestDTO("felipe@example.com", "12345678"), IP);
+
+        verify(rateLimiter).recordLoginSuccess("felipe@example.com", IP);
+        verify(rateLimiter, never()).recordLoginFailure(anyString(), anyString());
+    }
 
     @Test
     void login_WithValidCredentials_ReturnsTokenAndUserSummary() {
@@ -46,7 +83,7 @@ class AuthServiceTest {
                 .thenReturn(new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
         when(jwtService.generateToken("felipe@example.com")).thenReturn("jwt-token");
 
-        LoginResponseDTO result = authService.login(new LoginRequestDTO("felipe@example.com", "123456"));
+        LoginResponseDTO result = authService.login(new LoginRequestDTO("felipe@example.com", "123456"), IP);
 
         assertEquals("jwt-token", result.token());
         assertEquals(1L, result.user().id());
@@ -62,7 +99,7 @@ class AuthServiceTest {
         when(authenticationManager.authenticate(any()))
                 .thenReturn(new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
 
-        authService.login(new LoginRequestDTO("felipe@example.com", "123456"));
+        authService.login(new LoginRequestDTO("felipe@example.com", "123456"), IP);
 
         ArgumentCaptor<Authentication> captor = ArgumentCaptor.forClass(Authentication.class);
         verify(authenticationManager).authenticate(captor.capture());
@@ -76,7 +113,7 @@ class AuthServiceTest {
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         assertThrows(BadCredentialsException.class,
-                () -> authService.login(new LoginRequestDTO("felipe@example.com", "senhaErrada")));
+                () -> authService.login(new LoginRequestDTO("felipe@example.com", "senhaErrada"), IP));
         verify(jwtService, never()).generateToken(anyString());
     }
 }

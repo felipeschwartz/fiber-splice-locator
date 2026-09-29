@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,17 +19,28 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final AuthRateLimiter rateLimiter;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService) {
+    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, AuthRateLimiter rateLimiter) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.rateLimiter = rateLimiter;
     }
 
-    public LoginResponseDTO login(LoginRequestDTO request) {
+    public LoginResponseDTO login(LoginRequestDTO request, String clientIp) {
         logger.info("Authenticating user: {}", request.email());
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
+        rateLimiter.checkLoginAllowed(request.email(), clientIp);
+
+        Authentication auth;
+        try {
+            auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+        } catch (AuthenticationException e) {
+            rateLimiter.recordLoginFailure(request.email(), clientIp);
+            throw e;
+        }
+        rateLimiter.recordLoginSuccess(request.email(), clientIp);
 
         CustomUserDetails principal = (CustomUserDetails) auth.getPrincipal();
         String token = jwtService.generateToken(principal.getEmail());

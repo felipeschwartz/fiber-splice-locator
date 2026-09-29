@@ -1,0 +1,15 @@
+# Só para desenvolvimento local (perfil padrão). Em servidor use SPRING_PROFILES_ACTIVE=prod
+# e defina SPRING_DATASOURCE_URL/USERNAME/PASSWORD e JWT_SECRET no ambiente.
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fiber_splice_locator}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234567890}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:fiber-splice-locator-dev-only-secret-key}
+
+logging:
+  level:
+    org.springframework.security: DEBUG

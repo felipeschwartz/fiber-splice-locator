@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public interface AuthControllerDocs {
 
     @Operation(
             summary = "Logs in",
-            description = "Authenticates with email and password, returning a JWT bearer token and a summary of the authenticated user.",
+            description = "Authenticates with email and password, returning a JWT bearer token and a summary of the authenticated user. After 5 failed attempts for the same email from the same IP within 15 minutes, further attempts are rejected with 429 until the window ends.",
             tags = {"Auth"},
             requestBody = @RequestBody(
                     description = "Login credentials",
@@ -33,15 +34,16 @@ public interface AuthControllerDocs {
                     ),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
                     @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content),
+                    @ApiResponse(description = "Too Many Requests", responseCode = "429", content = @Content),
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
     @SecurityRequirements
-    ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request);
+    ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request, HttpServletRequest httpRequest);
 
     @Operation(
             summary = "Requests a password reset code",
-            description = "If the given email belongs to a registered user, an 8-character reset code is generated, valid for 15 minutes, and sent by email. Always responds successfully regardless of whether the email exists, to avoid revealing registered accounts.",
+            description = "If the given email belongs to a registered user, an 8-character reset code is generated, valid for 15 minutes, and sent by email. Always responds successfully regardless of whether the email exists, to avoid revealing registered accounts. Limited to 3 requests per email and 10 per IP within 15 minutes (429 beyond that).",
             tags = {"Auth"},
             requestBody = @RequestBody(
                     description = "Account email",
@@ -51,11 +53,12 @@ public interface AuthControllerDocs {
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200", content = @Content),
                     @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content),
+                    @ApiResponse(description = "Too Many Requests", responseCode = "429", content = @Content),
                     @ApiResponse(description = "Internal Server Error", responseCode = "500", content = @Content)
             }
     )
     @SecurityRequirements
-    ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request);
+    ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request, HttpServletRequest httpRequest);
 
     @Operation(
             summary = "Resets the password using a reset code",

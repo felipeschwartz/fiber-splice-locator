@@ -47,7 +47,7 @@ class UserControllerIT {
                 1L,
                 "Felipe Schwartz",
                 "felipe@example.com",
-                "123456", true
+                "12345678", true
         );
     }
 
@@ -90,7 +90,7 @@ class UserControllerIT {
                 null,
                 "",
                 "invalido@example.com",
-                "123456",
+                "12345678",
                 true
         );
 

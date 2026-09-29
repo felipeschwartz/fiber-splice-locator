@@ -5,6 +5,7 @@ import github.felipeschwartz.fiber_splice_locator.model.dto.*;
 import github.felipeschwartz.fiber_splice_locator.service.AuthService;
 import github.felipeschwartz.fiber_splice_locator.service.PasswordResetService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,14 +28,14 @@ public class AuthController implements AuthControllerDocs {
 
     @PostMapping("/login")
     @Override
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO request, HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(authService.login(request, httpRequest.getRemoteAddr()));
     }
 
     @PostMapping("/forgot-password")
     @Override
-    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request) {
-        passwordResetService.requestReset(request.email());
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO request, HttpServletRequest httpRequest) {
+        passwordResetService.requestReset(request.email(), httpRequest.getRemoteAddr());
         return ResponseEntity.ok().build();
     }
 

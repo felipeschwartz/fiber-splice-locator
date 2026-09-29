@@ -2,7 +2,6 @@ package github.felipeschwartz.fiber_splice_locator.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,14 +21,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.List;
 
 @Configuration
-@Profile("dev")
 @EnableMethodSecurity(securedEnabled = true)
-public class SecurityConfigDev {
+public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtFilter jwtFilter;
 
-    public SecurityConfigDev(
+    public SecurityConfig(
             UserDetailsService userDetailsService,
             JwtFilter jwtFilter
     ) {

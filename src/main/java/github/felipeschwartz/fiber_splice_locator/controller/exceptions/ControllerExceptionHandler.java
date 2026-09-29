@@ -2,6 +2,7 @@ package github.felipeschwartz.fiber_splice_locator.controller.exceptions;
 
 import github.felipeschwartz.fiber_splice_locator.service.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -103,6 +104,20 @@ public class ControllerExceptionHandler {
                 System.currentTimeMillis(), status.value(), "Operation Not Allowed", exception.getMessage(), request.getRequestURI()
         );
         return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(TooManyAttemptsException.class)
+    public ResponseEntity<StandardError> tooManyAttempts(
+            TooManyAttemptsException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.TOO_MANY_REQUESTS;
+        StandardError error = new StandardError(
+                System.currentTimeMillis(), status.value(), "Too Many Requests", exception.getMessage(), request.getRequestURI()
+        );
+        return ResponseEntity.status(status)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(exception.getRetryAfterSeconds()))
+                .body(error);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

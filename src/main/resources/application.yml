@@ -4,6 +4,11 @@ cors:
 app:
   storage:
     service-order-photos: /var/lib/my-application/service-order-photos
+  # Só usado fora do perfil dev, e só com o banco sem nenhum usuário (primeira subida em produção).
+  initial-admin:
+    email: ${INITIAL_ADMIN_EMAIL:}
+    password: ${INITIAL_ADMIN_PASSWORD:}
+    name: ${INITIAL_ADMIN_NAME:Administrador}
     
 spring:
   main:
@@ -18,9 +23,7 @@ spring:
     name: fiber_splice_locator
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/fiber_splice_locator}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:1234567890}
+    # url/username/password vêm de SPRING_DATASOURCE_*; os valores locais ficam no application-dev.yml.
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,6 +32,7 @@ spring:
     show-sql: false
     open-in-view: false
   profiles:
+    # Padrão para desenvolvimento local; servidores sobrescrevem com SPRING_PROFILES_ACTIVE=prod.
     active: dev
 
 resend:
@@ -37,12 +41,9 @@ resend:
 
 security:
   jwt:
-    secret: ${JWT_SECRET:fiber-splice-locator-dev-only-secret-key}
+    # Sem valor padrão de propósito: fora do perfil dev a aplicação não sobe sem JWT_SECRET.
+    secret: ${JWT_SECRET}
     expiration: 28800000
-
-logging:
-  level:
-    org.springframework.security: DEBUG
 
 springdoc:
   paths-to-match: /api/**/v1/**

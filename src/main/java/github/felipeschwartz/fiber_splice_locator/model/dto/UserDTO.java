@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
@@ -24,6 +25,7 @@ public class UserDTO extends RepresentationModel<UserDTO> implements Serializabl
     private String email;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
     private Set<UserRole> roles = new HashSet<>();

@@ -17,19 +17,17 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+// Histórico só cresce pelo ServiceOrderService (abertura/atendimento); aqui é só leitura e moderação.
 @Service
 public class ServiceOrderStatusDescriptionService {
     private static final Logger logger = LoggerFactory.getLogger(ServiceOrderStatusDescriptionService.class);
 
     private final ServiceOrderStatusDescriptionRepository service;
     private final ServiceOrderStatusDescriptionMapper mapper;
-    private final ServiceOrderAccessChecker accessChecker;
 
-    public ServiceOrderStatusDescriptionService(ServiceOrderStatusDescriptionRepository service, ServiceOrderStatusDescriptionMapper mapper,
-                                                ServiceOrderAccessChecker accessChecker) {
+    public ServiceOrderStatusDescriptionService(ServiceOrderStatusDescriptionRepository service, ServiceOrderStatusDescriptionMapper mapper) {
         this.service = service;
         this.mapper = mapper;
-        this.accessChecker = accessChecker;
     }
 
     @Transactional(readOnly = true)
@@ -66,31 +64,6 @@ public class ServiceOrderStatusDescriptionService {
     }
 
     @Transactional
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderStatusDescriptionDTO create(ServiceOrderStatusDescriptionDTO serviceOrderDTO) {
-        logger.info("Creating one Service Order Status Description!");
-        ServiceOrderStatusDescriptionDTO createdServiceOrderDTO = mapper.toDTO(
-                service.save(mapper.toEntity(serviceOrderDTO))
-        );
-        addHateoasLinks(createdServiceOrderDTO);
-        return createdServiceOrderDTO;
-    }
-
-    @Transactional
-    @PreAuthorize("hasRole('SUPER_ADMIN') or hasRole('ADMIN') or hasRole('FIELD_TECHNICIAN')")
-    public ServiceOrderStatusDescriptionDTO update(Long id, ServiceOrderStatusDescriptionDTO serviceOrderDTO) {
-        logger.info("Updating Service Order Status Description with id {}", id);
-        var entity = service.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Service order status description not found: " + id));
-        accessChecker.checkCanModify(entity.getServiceOrder());
-
-        mapper.updateEntityFromDTO(serviceOrderDTO, entity);
-        ServiceOrderStatusDescriptionDTO updatedServiceOrderDTO = mapper.toDTO(service.save(entity));
-        addHateoasLinks(updatedServiceOrderDTO);
-        return updatedServiceOrderDTO;
-    }
-
-    @Transactional
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public void delete(Long id) {
         logger.info("Deleting Service Order Status Description with id {}", id);
@@ -103,8 +76,6 @@ public class ServiceOrderStatusDescriptionService {
     private void addHateoasLinks(ServiceOrderStatusDescriptionDTO dto) {
         dto.add(linkTo(methodOn(ServiceOrderStatusDescriptionController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(ServiceOrderStatusDescriptionController.class).findAll()).withRel("findAll").withType("GET"));
-        dto.add(linkTo(methodOn(ServiceOrderStatusDescriptionController.class).create(dto)).withRel("create").withType("POST"));
-        dto.add(linkTo(methodOn(ServiceOrderStatusDescriptionController.class).update(dto.getId(), dto)).withRel("update").withType("PUT"));
         dto.add(linkTo(methodOn(ServiceOrderStatusDescriptionController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
     }
 }

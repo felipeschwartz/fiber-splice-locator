@@ -25,17 +25,21 @@ public class PasswordResetService {
     private final PasswordResetTokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final AuthRateLimiter rateLimiter;
     private final SecureRandom random = new SecureRandom();
 
-    public PasswordResetService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public PasswordResetService(UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, PasswordEncoder passwordEncoder, EmailService emailService,
+                                AuthRateLimiter rateLimiter) {
         this.userRepository = userRepository;
         this.tokenRepository = passwordResetTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.rateLimiter = rateLimiter;
     }
 
     @Transactional
-    public void requestReset(String email) {
+    public void requestReset(String email, String clientIp) {
+        rateLimiter.checkAndRecordPasswordResetRequest(email, clientIp);
         userRepository.findByEmail(email).ifPresent(user -> {
             tokenRepository.deleteByUser(user);
             String code = generateCode();
