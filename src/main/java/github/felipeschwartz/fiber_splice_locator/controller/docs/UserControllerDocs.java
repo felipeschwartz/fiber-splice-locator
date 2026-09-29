@@ -77,7 +77,7 @@ public interface UserControllerDocs {
 
     @Operation(
             summary = "Searches users",
-            description = "Searches users by ID (if the query is numeric) or by name (case-insensitive, partial match).",
+            description = "Searches users by ID (if the query is numeric) or by name (case-insensitive, partial match). Available to any authenticated user, so it returns only id, name and email (no roles or account status).",
             tags = {"User"},
             responses = {
                     @ApiResponse(

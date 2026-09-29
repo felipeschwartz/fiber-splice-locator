@@ -3,6 +3,7 @@ package github.felipeschwartz.fiber_splice_locator.service;
 import github.felipeschwartz.fiber_splice_locator.config.CustomUserDetails;
 import github.felipeschwartz.fiber_splice_locator.mapper.UserMapper;
 import github.felipeschwartz.fiber_splice_locator.model.dto.UserDTO;
+import github.felipeschwartz.fiber_splice_locator.model.dto.UserSearchResultDTO;
 import github.felipeschwartz.fiber_splice_locator.model.entities.User;
 import github.felipeschwartz.fiber_splice_locator.model.enums.UserRole;
 import github.felipeschwartz.fiber_splice_locator.repository.UserRepository;
@@ -159,6 +160,25 @@ class UserServiceTest {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ObjectNotFoundException.class, () -> userService.update(nonExisting, principal));
+    }
+
+    @Test
+    void search_WithNumericQuery_FindsById() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        List<UserSearchResultDTO> result = userService.search("1");
+
+        assertEquals(List.of(new UserSearchResultDTO(1L, "Felipe Schwartz", "felipe@example.com")), result);
+        verify(userRepository, never()).findByNameContainingIgnoreCase(anyString());
+    }
+
+    @Test
+    void search_WithTextQuery_FindsByName() {
+        when(userRepository.findByNameContainingIgnoreCase("felipe")).thenReturn(List.of(user));
+
+        List<UserSearchResultDTO> result = userService.search(" felipe ");
+
+        assertEquals(List.of(new UserSearchResultDTO(1L, "Felipe Schwartz", "felipe@example.com")), result);
     }
 
     @Test

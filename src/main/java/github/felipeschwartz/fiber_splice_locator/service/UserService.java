@@ -72,7 +72,7 @@ public class UserService {
                 ? userRepository.findById(Long.parseLong(value)).map(List::of).orElseGet(List::of)
                 : userRepository.findByNameContainingIgnoreCase(value);
         return results.stream()
-                .map(u -> new UserSearchResultDTO(u.getId(), u.getName(), u.getEmail(), u.getRoles(), u.getActive()))
+                .map(u -> new UserSearchResultDTO(u.getId(), u.getName(), u.getEmail()))
                 .collect(Collectors.toList());
     }
 
